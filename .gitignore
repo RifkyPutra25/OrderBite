@@ -1,0 +1,16 @@
+# Laravel
+/orderbite-backend/vendor
+/orderbite-backend/.env
+/orderbite-backend/storage/*.key
+/orderbite-backend/bootstrap/cache/*.php
+/orderbite-backend/public/hot
+/orderbite-backend/public/storage
+
+# React / Node
+/orderbite-frontend/node_modules
+/orderbite-frontend/dist
+/orderbite-frontend/.env
+
+# OS/Editor
+.DS_Store
+.vscode/
