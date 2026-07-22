@@ -1,9 +1,12 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminLayout from "./components/AdminLayout";
 import KasirDashboard from "./pages/KasirDashboard";
 import DapurDashboard from "./pages/DapurDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CategoriesPage from "./pages/admin/CategoriesPage";
+import MenuItemsPage from "./pages/admin/MenuItemsPage";
+import TablesPage from "./pages/admin/TablesPage";
 
 function App() {
   return (
@@ -15,10 +18,15 @@ function App() {
         path="/admin"
         element={
           <ProtectedRoute allowedRoles={["admin"]}>
-            <AdminDashboard />
+            <AdminLayout />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<Navigate to="categories" />} />
+        <Route path="categories" element={<CategoriesPage />} />
+        <Route path="menu-items" element={<MenuItemsPage />} />
+        <Route path="tables" element={<TablesPage />} />
+      </Route>
 
       <Route
         path="/kasir"
