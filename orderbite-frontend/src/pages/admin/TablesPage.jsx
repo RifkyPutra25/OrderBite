@@ -98,12 +98,13 @@ export default function TablesPage() {
       <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
         <thead>
           <tr>
-            <th>Nomor Meja</th>
-            <th>Kapasitas</th>
-            <th>Status</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
+             <th>ID</th>
+             <th>Nomor Meja</th>
+             <th>Kapasitas</th>
+             <th>Status</th>
+             <th>Aksi</th>
+         </tr>
+         </thead>
         <tbody>
           {tables.length === 0 ? (
             <tr>
@@ -112,6 +113,7 @@ export default function TablesPage() {
           ) : (
             tables.map((table) => (
               <tr key={table.id}>
+                <td>{table.id}</td>
                 <td>{table.nomor_meja}</td>
                 <td>{table.kapasitas} orang</td>
                 <td>{table.status === "kosong" ? "Kosong" : "Terisi"}</td>

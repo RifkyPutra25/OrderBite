@@ -7,13 +7,17 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CategoriesPage from "./pages/admin/CategoriesPage";
 import MenuItemsPage from "./pages/admin/MenuItemsPage";
 import TablesPage from "./pages/admin/TablesPage";
+import CustomerMenu from "./pages/customer/CustomerMenu";
+import OrderStatus from "./pages/customer/OrderStatus";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" />} />
-      <Route path="/login" element={<Login />} />
-
+      <Route path="/login" element={<Login />} />\
+      
+      <Route path="/order/:tableId" element={       <CustomerMenu />} />
+      <Route path="/order/:tableId/status/:orderId" element={<OrderStatus />} />
       <Route
         path="/admin"
         element={
@@ -33,7 +37,7 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["kasir"]}>
             <KasirDashboard />
-          </ProtectedRoute>
+          </ProtectedRoute> 
         }
       />
 
