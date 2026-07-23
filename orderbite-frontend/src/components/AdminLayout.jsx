@@ -12,18 +12,47 @@ export default function AdminLayout() {
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      <aside style={{ width: 220, background: "#1f2937", color: "white", padding: 20 }}>
-        <h3>OrderBite Admin</h3>
-        <p style={{ fontSize: 14, opacity: 0.7 }}>{user?.name}</p>
-        <nav style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 20 }}>
-          <Link to="/admin/categories" style={{ color: "white" }}>Kategori</Link>
-          <Link to="/admin/menu-items" style={{ color: "white" }}>Menu</Link>
-          <Link to="/admin/tables" style={{ color: "white" }}>Meja</Link>
-          <Link to="/admin/users" style={{ color: "white" }}>Akun Kasir/Dapur</Link>
-          <Link to="/admin/reports" style={{ color: "white" }}>Laporan</Link>
-        </nav>
-        <button onClick={handleLogout} style={{ marginTop: 30 }}>Logout</button>
-      </aside>
+      <aside style={{
+  width: 240,
+  background: "#111827",
+  color: "white",
+  padding: "24px 20px",
+  display: "flex",
+  flexDirection: "column",
+}}>
+  <h3 style={{ color: "white", marginBottom: 4 }}>🍽️ OrderBite</h3>
+  <p style={{ fontSize: 13, opacity: 0.6, marginTop: 0 }}>{user?.name}</p>
+
+  <nav style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 20 }}>
+    {[
+      { to: "/admin/categories", label: "Kategori" },
+      { to: "/admin/menu-items", label: "Menu" },
+      { to: "/admin/tables", label: "Meja" },
+      { to: "/admin/users", label: "Akun Kasir/Dapur" },
+      { to: "/admin/reports", label: "Laporan" },
+    ].map((item) => (
+      <Link
+        key={item.to}
+        to={item.to}
+        style={{
+          color: "#d1d5db",
+          textDecoration: "none",
+          padding: "10px 12px",
+          borderRadius: 6,
+          fontSize: 14,
+        }}
+        onMouseOver={(e) => e.currentTarget.style.background = "#1f2937"}
+        onMouseOut={(e) => e.currentTarget.style.background = "transparent"}
+      >
+        {item.label}
+      </Link>
+    ))}
+  </nav>
+
+  <button onClick={handleLogout} style={{ marginTop: "auto", background: "#dc2626" }}>
+    Logout
+  </button>
+</aside>
       <main style={{ flex: 1, padding: 30 }}>
         <Outlet />
       </main>

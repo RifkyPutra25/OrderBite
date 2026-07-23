@@ -44,21 +44,21 @@ export default function ReportsPage() {
 
       {/* Ringkasan */}
       <div style={{ display: "flex", gap: 15, marginBottom: 30, flexWrap: "wrap" }}>
-        <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 20, minWidth: 180 }}>
+        <div className="card" style={{ minWidth: 180 }}>
           <p style={{ margin: 0, fontSize: 13, color: "#666" }}>Pendapatan Hari Ini</p>
           <h3 style={{ margin: "5px 0" }}>{formatRupiah(summary.today_revenue)}</h3>
           <p style={{ margin: 0, fontSize: 12, color: "#888" }}>{summary.today_orders} pesanan</p>
         </div>
-        <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 20, minWidth: 180 }}>
+        <div className="card" style={{ minWidth: 180 }}>
           <p style={{ margin: 0, fontSize: 13, color: "#666" }}>Pendapatan Bulan Ini</p>
           <h3 style={{ margin: "5px 0" }}>{formatRupiah(summary.month_revenue)}</h3>
           <p style={{ margin: 0, fontSize: 12, color: "#888" }}>{summary.month_orders} pesanan</p>
         </div>
       </div>
 
-      {/* Grafik 7 hari terakhir (bar chart sederhana pakai div) */}
-      <div style={{ marginBottom: 30 }}>
-        <h3>Pendapatan 7 Hari Terakhir</h3>
+      {/* Grafik 7 hari terakhir */}
+      <div className="card" style={{ marginBottom: 30 }}>
+        <h3 style={{ marginTop: 0 }}>Pendapatan 7 Hari Terakhir</h3>
         {weeklyRevenue.length === 0 ? (
           <p>Belum ada data</p>
         ) : (
@@ -79,12 +79,12 @@ export default function ReportsPage() {
       </div>
 
       {/* Menu Terlaris */}
-      <div style={{ marginBottom: 30 }}>
-        <h3>Menu Terlaris</h3>
+      <div className="card" style={{ marginBottom: 30, maxWidth: 420 }}>
+        <h3 style={{ marginTop: 0 }}>Menu Terlaris</h3>
         {bestSellers.length === 0 ? (
           <p>Belum ada data</p>
         ) : (
-          <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%", maxWidth: 400 }}>
+          <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
             <thead>
               <tr><th>Menu</th><th>Terjual</th></tr>
             </thead>
@@ -101,8 +101,8 @@ export default function ReportsPage() {
       </div>
 
       {/* Riwayat Transaksi */}
-      <div>
-        <h3>Riwayat Transaksi (Lunas)</h3>
+      <div className="card">
+        <h3 style={{ marginTop: 0 }}>Riwayat Transaksi (Lunas)</h3>
         <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
           <thead>
             <tr>

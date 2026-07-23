@@ -23,7 +23,7 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "80px auto" }}>
+    <div className="login-container">
       <h2>Login OrderBite</h2>
       <form onSubmit={handleSubmit}>
         <div>

@@ -84,13 +84,12 @@ export default function CustomerMenu() {
   if (loading) return <p style={{ padding: 20 }}>Memuat...</p>;
   if (error && !table) return <p style={{ padding: 20, color: "red" }}>{error}</p>;
 
-  // Layar input nama dulu, sebelum bisa lihat menu
   if (!customerName) {
     return (
-      <div style={{ padding: 20, maxWidth: 400, margin: "40px auto" }}>
+      <div className="login-container">
         <h2>Selamat datang di OrderBite</h2>
         <p>Meja: <strong>{table?.nomor_meja}</strong></p>
-        <form onSubmit={handleSetName} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <form onSubmit={handleSetName}>
           <input
             type="text"
             placeholder="Masukkan nama Anda"
@@ -116,7 +115,7 @@ export default function CustomerMenu() {
             <p style={{ color: "#888" }}>Belum ada menu di kategori ini</p>
           ) : (
             cat.menu_items.map((item) => (
-              <div key={item.id} style={{ border: "1px solid #eee", padding: 12, borderRadius: 8, marginBottom: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div key={item.id} className="card" style={{ marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <strong>{item.nama}</strong>
                   <p style={{ margin: "4px 0", fontSize: 13, color: "#666" }}>{item.deskripsi}</p>
@@ -129,12 +128,12 @@ export default function CustomerMenu() {
         </div>
       ))}
 
-      {/* Keranjang fixed di bawah */}
       {cart.length > 0 && (
         <div style={{
           position: "fixed", bottom: 0, left: 0, right: 0,
           background: "white", borderTop: "2px solid #ddd", padding: 15,
           maxHeight: "40vh", overflowY: "auto",
+          boxShadow: "0 -4px 12px rgba(0,0,0,0.1)",
         }}>
           <h4>Keranjang</h4>
           {cart.map((c) => (

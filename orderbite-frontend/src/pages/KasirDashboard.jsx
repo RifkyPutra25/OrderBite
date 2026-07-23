@@ -106,10 +106,10 @@ export default function KasirDashboard() {
 
   return (
     <div style={{ padding: 30, display: "flex", flexDirection: "column", gap: 30 }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>Dashboard Kasir — {user?.name}</h1>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
+        <div className="card" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+  <h1 style={{ margin: 0 }}>Dashboard Kasir — {user?.name}</h1>
+  <button onClick={handleLogout} style={{ background: "#dc2626" }}>Logout</button>
+    </div>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 

@@ -67,12 +67,10 @@ export default function DapurDashboard() {
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 15 }}>
           {pendingItems.map((item) => (
-            <div key={item.id} style={{
-              border: "1px solid #ccc",
-              borderRadius: 8,
-              padding: 15,
-              background: item.status === "dimasak" ? "#fef3c7" : "#f3f4f6",
-            }}>
+              <div key={item.id} className="card" style={{
+               background: item.status === "dimasak" ? "#fef3c7" : "white",
+               borderLeft: item.status === "dimasak" ? "4px solid #f59e0b" : "4px solid #9ca3af",
+                }}>
               <h4 style={{ margin: 0 }}>Meja {item.tableNumber}</h4>
               <p style={{ margin: "4px 0", fontSize: 13, color: "#555" }}>{item.customerName}</p>
               <strong>{item.menu_item?.nama} x{item.qty}</strong>
