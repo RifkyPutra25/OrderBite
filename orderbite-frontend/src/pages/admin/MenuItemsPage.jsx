@@ -9,9 +9,9 @@ export default function MenuItemsPage() {
     nama: "",
     deskripsi: "",
     harga: "",
-    foto_url: "",
     tersedia: true,
   });
+  const [fotoFile, setFotoFile] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -36,23 +36,44 @@ export default function MenuItemsPage() {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+    const { name, value, type, checked, files } = e.target;
+    if (type === "file") {
+      setFotoFile(files[0]);
+    } else {
+      setForm({ ...form, [name]: type === "checkbox" ? checked : value });
+    }
   };
 
   const resetForm = () => {
-    setForm({ category_id: "", nama: "", deskripsi: "", harga: "", foto_url: "", tersedia: true });
+    setForm({ category_id: "", nama: "", deskripsi: "", harga: "", tersedia: true });
+    setFotoFile(null);
     setEditingId(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    const formData = new FormData();
+    formData.append("category_id", form.category_id);
+    formData.append("nama", form.nama);
+    formData.append("deskripsi", form.deskripsi);
+    formData.append("harga", form.harga);
+    formData.append("tersedia", form.tersedia ? 1 : 0);
+    if (fotoFile) {
+      formData.append("foto", fotoFile);
+    }
+
     try {
       if (editingId) {
-        await api.put(`/menu-items/${editingId}`, form);
+        formData.append("_method", "PUT");
+        await api.post(`/menu-items/${editingId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       } else {
-        await api.post("/menu-items", form);
+        await api.post("/menu-items", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       }
       resetForm();
       fetchData();
@@ -68,9 +89,9 @@ export default function MenuItemsPage() {
       nama: item.nama,
       deskripsi: item.deskripsi || "",
       harga: item.harga,
-      foto_url: item.foto_url || "",
       tersedia: !!item.tersedia,
     });
+    setFotoFile(null);
   };
 
   const handleDelete = async (id) => {
@@ -106,7 +127,11 @@ export default function MenuItemsPage() {
         <input type="text" name="nama" placeholder="Nama menu" value={form.nama} onChange={handleChange} required />
         <textarea name="deskripsi" placeholder="Deskripsi" value={form.deskripsi} onChange={handleChange} />
         <input type="number" name="harga" placeholder="Harga" value={form.harga} onChange={handleChange} required min="0" step="0.01" />
-        <input type="text" name="foto_url" placeholder="URL Foto (opsional)" value={form.foto_url} onChange={handleChange} />
+
+        <input type="file" name="foto" accept="image/*" onChange={handleChange} />
+        {editingId && !fotoFile && (
+          <p style={{ fontSize: 12, color: "#666", margin: 0 }}>Kosongkan jika tidak ingin ganti foto</p>
+        )}
 
         <label>
           <input type="checkbox" name="tersedia" checked={form.tersedia} onChange={handleChange} />
@@ -124,6 +149,7 @@ export default function MenuItemsPage() {
       <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
         <thead>
           <tr>
+            <th>Foto</th>
             <th>Nama</th>
             <th>Kategori</th>
             <th>Harga</th>
@@ -134,11 +160,18 @@ export default function MenuItemsPage() {
         <tbody>
           {menuItems.length === 0 ? (
             <tr>
-              <td colSpan="5" style={{ textAlign: "center" }}>Belum ada menu</td>
+              <td colSpan="6" style={{ textAlign: "center" }}>Belum ada menu</td>
             </tr>
           ) : (
             menuItems.map((item) => (
               <tr key={item.id}>
+                <td>
+                  {item.foto_full_url ? (
+                    <img src={item.foto_full_url} alt={item.nama} style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 6 }} />
+                  ) : (
+                    <span style={{ color: "#ccc" }}>-</span>
+                  )}
+                </td>
                 <td>{item.nama}</td>
                 <td>{item.category?.nama_kategori || "-"}</td>
                 <td>Rp {Number(item.harga).toLocaleString("id-ID")}</td>

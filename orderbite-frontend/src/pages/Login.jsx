@@ -23,20 +23,22 @@ export default function Login() {
   };
 
   return (
-    <div className="login-container">
-      <h2>Login OrderBite</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </div>
-        <div>
-          <label>Password</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit">Login</button>
-      </form>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #a9cba3 0%, #4f8a5c 100%)" }}>
+      <div className="login-container" style={{ margin: 0 }}>
+        <h2>🍽️ Login OrderBite</h2>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </div>
+          <div>
+            <label>Password</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </div>
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <button type="submit">Login</button>
+        </form>
+      </div>
     </div>
   );
 }

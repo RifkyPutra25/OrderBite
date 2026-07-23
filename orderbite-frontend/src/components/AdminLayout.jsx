@@ -1,59 +1,67 @@
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
+import { LayoutGrid, UtensilsCrossed, Table2, Users, BarChart3, LogOut, Store } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+
+const NAV_ITEMS = [
+  { to: "/admin/categories", label: "Kategori", icon: LayoutGrid },
+  { to: "/admin/menu-items", label: "Menu", icon: UtensilsCrossed },
+  { to: "/admin/tables", label: "Meja", icon: Table2 },
+  { to: "/admin/users", label: "Akun Kasir/Dapur", icon: Users },
+  { to: "/admin/reports", label: "Laporan", icon: BarChart3 },
+];
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     await logout();
     navigate("/login");
   };
 
+  const initials = user?.name
+    ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
+    : "A";
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      <aside style={{
-  width: 240,
-  background: "#111827",
-  color: "white",
-  padding: "24px 20px",
-  display: "flex",
-  flexDirection: "column",
-}}>
-  <h3 style={{ color: "white", marginBottom: 4 }}>🍽️ OrderBite</h3>
-  <p style={{ fontSize: 13, opacity: 0.6, marginTop: 0 }}>{user?.name}</p>
+    <div className="admin-shell">
+      <aside className="sidebar">
+        <div className="sidebar-brand">
+          <div className="sidebar-brand-icon"><Store size={19} /></div>
+          <h3>OrderBite</h3>
+        </div>
 
-  <nav style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 20 }}>
-    {[
-      { to: "/admin/categories", label: "Kategori" },
-      { to: "/admin/menu-items", label: "Menu" },
-      { to: "/admin/tables", label: "Meja" },
-      { to: "/admin/users", label: "Akun Kasir/Dapur" },
-      { to: "/admin/reports", label: "Laporan" },
-    ].map((item) => (
-      <Link
-        key={item.to}
-        to={item.to}
-        style={{
-          color: "#d1d5db",
-          textDecoration: "none",
-          padding: "10px 12px",
-          borderRadius: 6,
-          fontSize: 14,
-        }}
-        onMouseOver={(e) => e.currentTarget.style.background = "#1f2937"}
-        onMouseOut={(e) => e.currentTarget.style.background = "transparent"}
-      >
-        {item.label}
-      </Link>
-    ))}
-  </nav>
+        <div className="sidebar-user">
+          <div className="sidebar-user-avatar">{initials}</div>
+          <span className="sidebar-user-name">{user?.name}</span>
+        </div>
 
-  <button onClick={handleLogout} style={{ marginTop: "auto", background: "#dc2626" }}>
-    Logout
-  </button>
-</aside>
-      <main style={{ flex: 1, padding: 30 }}>
+        <nav className="sidebar-nav">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname.startsWith(item.to);
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={`sidebar-link ${isActive ? "active" : ""}`}
+              >
+                <Icon size={18} />
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <button className="sidebar-logout" onClick={handleLogout}>
+          <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
+            <LogOut size={16} /> Logout
+          </span>
+        </button>
+      </aside>
+
+      <main className="admin-content">
         <Outlet />
       </main>
     </div>
