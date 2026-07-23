@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import echo from "../../echo";
 import publicApi from "../../api/publicAxios";
 
 export default function OrderStatus() {
@@ -20,10 +21,16 @@ export default function OrderStatus() {
   };
 
   useEffect(() => {
-    fetchOrder();
-    const interval = setInterval(fetchOrder, 4000); // polling status tiap 4 detik
-    return () => clearInterval(interval);
-  }, [orderId]);
+  fetchOrder();
+
+  const channel = echo.channel(`order.${orderId}`);
+  channel.listen(".item.status.updated", () => fetchOrder());
+  channel.listen(".order.payment.updated", () => fetchOrder());
+
+  return () => {
+    echo.leaveChannel(`order.${orderId}`);
+  };
+}, [orderId]);
 
   if (loading) return <p style={{ padding: 20 }}>Memuat...</p>;
   if (error) return <p style={{ padding: 20, color: "red" }}>{error}</p>;

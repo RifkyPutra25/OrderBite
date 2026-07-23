@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import echo from "../echo";
 import api from "../api/axios";
 
 export default function DapurDashboard() {
@@ -22,11 +23,17 @@ export default function DapurDashboard() {
     }
   };
 
-  useEffect(() => {
-    fetchOrders();
-    const interval = setInterval(fetchOrders, 4000); // polling tiap 4 detik
-    return () => clearInterval(interval);
-  }, []);
+ useEffect(() => {
+  fetchOrders();
+
+  const channel = echo.channel("orders");
+  channel.listen(".order.created", () => fetchOrders());
+  channel.listen(".item.status.updated", () => fetchOrders());
+
+  return () => {
+    echo.leaveChannel("orders");
+  };
+}, []);
 
   const handleLogout = async () => {
     await logout();

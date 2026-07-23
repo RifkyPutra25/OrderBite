@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\RestoTable;
+use App\Events\OrderCreated;
+use App\Events\OrderItemStatusUpdated;
+use App\Events\OrderPaymentUpdated;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -61,7 +64,7 @@ class OrderController extends Controller
 
         // Tandai meja jadi terisi
         RestoTable::where('id', $data['resto_table_id'])->update(['status' => 'terisi']);
-
+        broadcast(new OrderCreated($order));
         return $order->load(['table', 'items.menuItem']);
     }
 
@@ -69,7 +72,7 @@ class OrderController extends Controller
     public function updatePayment(Order $order)
     {
         $order->update(['status_pembayaran' => 'lunas']);
-
+        broadcast(new OrderPaymentUpdated($order));
         return $order;
     }
 
@@ -89,7 +92,7 @@ class OrderController extends Controller
         ]);
 
         $orderItem->update($data);
-
+        broadcast(new OrderItemStatusUpdated($orderItem));
         return $orderItem->load('menuItem');
     }
 }

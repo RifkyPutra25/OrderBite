@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import echo from "../echo";
 import api from "../api/axios";
 
 export default function KasirDashboard() {
@@ -36,11 +37,17 @@ export default function KasirDashboard() {
   };
 
   useEffect(() => {
-    fetchAll();
-    // Polling setiap 5 detik untuk update real-time sederhana
-    const interval = setInterval(fetchAll, 5000);
-    return () => clearInterval(interval);
-  }, []);
+  fetchAll();
+
+  const channel = echo.channel("orders");
+  channel.listen(".order.created", () => fetchAll());
+  channel.listen(".item.status.updated", () => fetchAll());
+  channel.listen(".order.payment.updated", () => fetchAll());
+
+  return () => {
+    echo.leaveChannel("orders");
+  };
+}, []);
 
   const handleLogout = async () => {
     await logout();
