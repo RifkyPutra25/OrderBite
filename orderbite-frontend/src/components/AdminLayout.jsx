@@ -20,6 +20,7 @@ export default function AdminLayout() {
           <Link to="/admin/menu-items" style={{ color: "white" }}>Menu</Link>
           <Link to="/admin/tables" style={{ color: "white" }}>Meja</Link>
           <Link to="/admin/users" style={{ color: "white" }}>Akun Kasir/Dapur</Link>
+          <Link to="/admin/reports" style={{ color: "white" }}>Laporan</Link>
         </nav>
         <button onClick={handleLogout} style={{ marginTop: 30 }}>Logout</button>
       </aside>

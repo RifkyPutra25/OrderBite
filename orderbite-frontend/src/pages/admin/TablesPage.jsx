@@ -1,3 +1,4 @@
+import { QRCodeSVG } from "qrcode.react";
 import { useState, useEffect } from "react";
 import api from "../../api/axios";
 
@@ -7,6 +8,7 @@ export default function TablesPage() {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [qrTable, setQrTable] = useState(null);
 
   const fetchTables = async () => {
     try {
@@ -120,12 +122,34 @@ export default function TablesPage() {
                 <td>
                   <button onClick={() => handleEdit(table)}>Edit</button>
                   <button onClick={() => handleDelete(table.id)}>Hapus</button>
+                  <button onClick={() => setQrTable(table)}>Lihat QR</button>
                 </td>
               </tr>
             ))
           )}
         </tbody>
       </table>
+      {qrTable && (
+  <div style={{
+    position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+    background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center",
+  }}>
+    <div style={{ background: "white", padding: 30, borderRadius: 10, textAlign: "center" }}>
+      <h3>QR Code Meja {qrTable.nomor_meja}</h3>
+      <QRCodeSVG
+        value={`${window.location.origin}/order/${qrTable.id}`}
+        size={220}
+      />
+      <p style={{ fontSize: 12, wordBreak: "break-all", marginTop: 10 }}>
+        {window.location.origin}/order/{qrTable.id}
+      </p>
+      <div style={{ marginTop: 15 }}>
+        <button onClick={() => window.print()}>Print</button>
+        <button onClick={() => setQrTable(null)} style={{ marginLeft: 10 }}>Tutup</button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

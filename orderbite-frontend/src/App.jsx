@@ -9,19 +9,21 @@ import MenuItemsPage from "./pages/admin/MenuItemsPage";
 import TablesPage from "./pages/admin/TablesPage";
 import CustomerMenu from "./pages/customer/CustomerMenu";
 import OrderStatus from "./pages/customer/OrderStatus";
+import ReportsPage from "./pages/admin/ReportsPage";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" element={<Login />} />\
-      
+
       <Route path="/order/:tableId" element={       <CustomerMenu />} />
       <Route path="/order/:tableId/status/:orderId" element={<OrderStatus />} />
       <Route
         path="/admin"
         element={
           <ProtectedRoute allowedRoles={["admin"]}>
+            <Route path="reports" element={<ReportsPage />} />
             <AdminLayout />
           </ProtectedRoute>
         }
