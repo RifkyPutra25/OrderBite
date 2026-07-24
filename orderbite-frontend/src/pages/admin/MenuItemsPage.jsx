@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { UtensilsCrossed, Plus, Pencil, Trash2, ImageOff, PackageOpen } from "lucide-react";
 import api from "../../api/axios";
 
 export default function MenuItemsPage() {
@@ -60,9 +61,7 @@ export default function MenuItemsPage() {
     formData.append("deskripsi", form.deskripsi);
     formData.append("harga", form.harga);
     formData.append("tersedia", form.tersedia ? 1 : 0);
-    if (fotoFile) {
-      formData.append("foto", fotoFile);
-    }
+    if (fotoFile) formData.append("foto", fotoFile);
 
     try {
       if (editingId) {
@@ -104,87 +103,126 @@ export default function MenuItemsPage() {
     }
   };
 
-  if (loading) return <p>Memuat...</p>;
-
   return (
     <div>
-      <h2>Kelola Menu</h2>
+      <div className="page-header">
+        <div>
+          <div className="page-header-icon"><UtensilsCrossed size={22} /></div>
+          <h2>Kelola Menu</h2>
+          <p>Tambah, ubah, dan atur ketersediaan menu makanan & minuman.</p>
+        </div>
+      </div>
 
       {categories.length === 0 && (
-        <p style={{ color: "orange" }}>
-          Belum ada kategori. Silakan tambah kategori dulu di menu "Kategori".
-        </p>
+        <div className="card" style={{ marginBottom: 20, background: "#fffbeb", border: "1px solid #fde68a" }}>
+          <p style={{ margin: 0, color: "#92400e", fontSize: 14 }}>
+            Belum ada kategori. Silakan tambah kategori dulu di menu "Kategori".
+          </p>
+        </div>
       )}
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: 20, display: "flex", flexDirection: "column", gap: 8, maxWidth: 400 }}>
-        <select name="category_id" value={form.category_id} onChange={handleChange} required>
-          <option value="">-- Pilih Kategori --</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>{cat.nama_kategori}</option>
-          ))}
-        </select>
+      <div className="form-card">
+        <h4>{editingId ? "Edit Menu" : "Tambah Menu Baru"}</h4>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div className="form-row">
+              <label>Kategori</label>
+              <select name="category_id" value={form.category_id} onChange={handleChange} required>
+                <option value="">-- Pilih Kategori --</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>{cat.nama_kategori}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-row">
+              <label>Nama Menu</label>
+              <input type="text" name="nama" placeholder="Contoh: Nasi Goreng Spesial" value={form.nama} onChange={handleChange} required />
+            </div>
+          </div>
 
-        <input type="text" name="nama" placeholder="Nama menu" value={form.nama} onChange={handleChange} required />
-        <textarea name="deskripsi" placeholder="Deskripsi" value={form.deskripsi} onChange={handleChange} />
-        <input type="number" name="harga" placeholder="Harga" value={form.harga} onChange={handleChange} required min="0" step="0.01" />
+          <div className="form-row">
+            <label>Deskripsi</label>
+            <textarea name="deskripsi" placeholder="Deskripsi singkat menu" value={form.deskripsi} onChange={handleChange} rows={2} />
+          </div>
 
-        <input type="file" name="foto" accept="image/*" onChange={handleChange} />
-        {editingId && !fotoFile && (
-          <p style={{ fontSize: 12, color: "#666", margin: 0 }}>Kosongkan jika tidak ingin ganti foto</p>
-        )}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div className="form-row">
+              <label>Harga (Rp)</label>
+              <input type="number" name="harga" placeholder="25000" value={form.harga} onChange={handleChange} required min="0" step="0.01" />
+            </div>
+            <div className="form-row">
+              <label>Foto Menu</label>
+              <input type="file" name="foto" accept="image/*" onChange={handleChange} />
+              {editingId && !fotoFile && (
+                <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Kosongkan jika tidak ingin ganti foto</span>
+              )}
+            </div>
+          </div>
 
-        <label>
-          <input type="checkbox" name="tersedia" checked={form.tersedia} onChange={handleChange} />
-          {" "}Tersedia
-        </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", marginBottom: 14 }}>
+            <input type="checkbox" name="tersedia" checked={form.tersedia} onChange={handleChange} style={{ width: "auto" }} />
+            <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text)" }}>Tersedia untuk dipesan</span>
+          </label>
 
-        <div>
-          <button type="submit">{editingId ? "Update" : "Tambah"}</button>
-          {editingId && <button type="button" onClick={resetForm}>Batal</button>}
+          <div className="form-actions">
+            <button type="submit">
+              {editingId ? <Pencil size={15} /> : <Plus size={15} />}
+              {editingId ? "Update Menu" : "Tambah Menu"}
+            </button>
+            {editingId && <button type="button" className="secondary" onClick={resetForm}>Batal</button>}
+          </div>
+        </form>
+        {error && <p style={{ color: "#dc2626", fontSize: 13, marginTop: 10, marginBottom: 0 }}>{error}</p>}
+      </div>
+
+      {loading ? (
+        <div className="loading-wrap"><div className="spinner" /> Memuat data...</div>
+      ) : menuItems.length === 0 ? (
+        <div className="card empty-state">
+          <div className="empty-state-icon"><PackageOpen size={26} /></div>
+          <p>Belum ada menu. Tambahkan menu pertama Anda di atas.</p>
         </div>
-      </form>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            <th>Foto</th>
-            <th>Nama</th>
-            <th>Kategori</th>
-            <th>Harga</th>
-            <th>Tersedia</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {menuItems.length === 0 ? (
+      ) : (
+        <table>
+          <thead>
             <tr>
-              <td colSpan="6" style={{ textAlign: "center" }}>Belum ada menu</td>
+              <th style={{ width: 60 }}>Foto</th>
+              <th>Nama</th>
+              <th>Kategori</th>
+              <th>Harga</th>
+              <th>Status</th>
+              <th style={{ width: 100 }}>Aksi</th>
             </tr>
-          ) : (
-            menuItems.map((item) => (
+          </thead>
+          <tbody>
+            {menuItems.map((item) => (
               <tr key={item.id}>
                 <td>
                   {item.foto_full_url ? (
-                    <img src={item.foto_full_url} alt={item.nama} style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 6 }} />
+                    <img src={item.foto_full_url} alt={item.nama} style={{ width: 44, height: 44, objectFit: "cover", borderRadius: 8 }} />
                   ) : (
-                    <span style={{ color: "#ccc" }}>-</span>
+                    <div style={{ width: 44, height: 44, borderRadius: 8, background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-faint)" }}>
+                      <ImageOff size={16} />
+                    </div>
                   )}
                 </td>
-                <td>{item.nama}</td>
+                <td style={{ fontWeight: 600 }}>{item.nama}</td>
                 <td>{item.category?.nama_kategori || "-"}</td>
                 <td>Rp {Number(item.harga).toLocaleString("id-ID")}</td>
-                <td>{item.tersedia ? "Ya" : "Tidak"}</td>
                 <td>
-                  <button onClick={() => handleEdit(item)}>Edit</button>
-                  <button onClick={() => handleDelete(item.id)}>Hapus</button>
+                  <span className={`badge ${item.tersedia ? "badge-success" : "badge-neutral"}`}>
+                    {item.tersedia ? "Tersedia" : "Tidak Tersedia"}
+                  </span>
+                </td>
+                <td>
+                  <button className="icon-btn secondary" onClick={() => handleEdit(item)} title="Edit"><Pencil size={15} /></button>
+                  <button className="icon-btn danger" onClick={() => handleDelete(item.id)} title="Hapus"><Trash2 size={15} /></button>
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

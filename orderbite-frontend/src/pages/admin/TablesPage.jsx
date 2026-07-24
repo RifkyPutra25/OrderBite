@@ -1,5 +1,6 @@
-import { QRCodeSVG } from "qrcode.react";
 import { useState, useEffect } from "react";
+import { Table2, Plus, Pencil, Trash2, QrCode, LayoutGrid } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import api from "../../api/axios";
 
 export default function TablesPage() {
@@ -65,91 +66,94 @@ export default function TablesPage() {
     }
   };
 
-  if (loading) return <p>Memuat...</p>;
-
   return (
     <div>
-      <h2>Kelola Meja</h2>
-
-      <form onSubmit={handleSubmit} style={{ marginBottom: 20, display: "flex", flexDirection: "column", gap: 8, maxWidth: 300 }}>
-        <input
-          type="text"
-          name="nomor_meja"
-          placeholder="Nomor meja (contoh: A1)"
-          value={form.nomor_meja}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="number"
-          name="kapasitas"
-          placeholder="Kapasitas (jumlah kursi)"
-          value={form.kapasitas}
-          onChange={handleChange}
-          required
-          min="1"
-        />
+      <div className="page-header">
         <div>
-          <button type="submit">{editingId ? "Update" : "Tambah"}</button>
-          {editingId && <button type="button" onClick={resetForm}>Batal</button>}
+          <div className="page-header-icon"><Table2 size={22} /></div>
+          <h2>Kelola Meja</h2>
+          <p>Atur nomor meja, kapasitas, dan QR code untuk tiap meja.</p>
         </div>
-      </form>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-             <th>ID</th>
-             <th>Nomor Meja</th>
-             <th>Kapasitas</th>
-             <th>Status</th>
-             <th>Aksi</th>
-         </tr>
-         </thead>
-        <tbody>
-          {tables.length === 0 ? (
-            <tr>
-              <td colSpan="4" style={{ textAlign: "center" }}>Belum ada meja</td>
-            </tr>
-          ) : (
-            tables.map((table) => (
-              <tr key={table.id}>
-                <td>{table.id}</td>
-                <td>{table.nomor_meja}</td>
-                <td>{table.kapasitas} orang</td>
-                <td>{table.status === "kosong" ? "Kosong" : "Terisi"}</td>
-                <td>
-                  <button onClick={() => handleEdit(table)}>Edit</button>
-                  <button onClick={() => handleDelete(table.id)}>Hapus</button>
-                  <button onClick={() => setQrTable(table)}>Lihat QR</button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-      {qrTable && (
-  <div style={{
-    position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-    background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center",
-  }}>
-    <div style={{ background: "white", padding: 30, borderRadius: 10, textAlign: "center" }}>
-      <h3>QR Code Meja {qrTable.nomor_meja}</h3>
-      <QRCodeSVG
-        value={`${window.location.origin}/order/${qrTable.id}`}
-        size={220}
-      />
-      <p style={{ fontSize: 12, wordBreak: "break-all", marginTop: 10 }}>
-        {window.location.origin}/order/{qrTable.id}
-      </p>
-      <div style={{ marginTop: 15 }}>
-        <button onClick={() => window.print()}>Print</button>
-        <button onClick={() => setQrTable(null)} style={{ marginLeft: 10 }}>Tutup</button>
       </div>
-    </div>
-  </div>
-)}
+
+      <div className="form-card">
+        <h4>{editingId ? "Edit Meja" : "Tambah Meja Baru"}</h4>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: "flex", gap: 14, alignItems: "flex-end", flexWrap: "wrap" }}>
+            <div className="form-row" style={{ marginBottom: 0, minWidth: 180 }}>
+              <label>Nomor Meja</label>
+              <input type="text" name="nomor_meja" placeholder="Contoh: A1" value={form.nomor_meja} onChange={handleChange} required />
+            </div>
+            <div className="form-row" style={{ marginBottom: 0, minWidth: 160 }}>
+              <label>Kapasitas</label>
+              <input type="number" name="kapasitas" placeholder="4" value={form.kapasitas} onChange={handleChange} required min="1" />
+            </div>
+            <div className="form-actions" style={{ marginTop: 0 }}>
+              <button type="submit">
+                {editingId ? <Pencil size={15} /> : <Plus size={15} />}
+                {editingId ? "Update" : "Tambah"}
+              </button>
+              {editingId && <button type="button" className="secondary" onClick={resetForm}>Batal</button>}
+            </div>
+          </div>
+        </form>
+        {error && <p style={{ color: "#dc2626", fontSize: 13, marginTop: 10, marginBottom: 0 }}>{error}</p>}
+      </div>
+
+      {loading ? (
+        <div className="loading-wrap"><div className="spinner" /> Memuat data...</div>
+      ) : tables.length === 0 ? (
+        <div className="card empty-state">
+          <div className="empty-state-icon"><LayoutGrid size={26} /></div>
+          <p>Belum ada meja. Tambahkan meja pertama Anda di atas.</p>
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 14 }}>
+          {tables.map((table) => (
+            <div key={table.id} className="card">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 20 }}>{table.nomor_meja}</h3>
+                  <p style={{ margin: "3px 0 0", fontSize: 13 }}>{table.kapasitas} orang</p>
+                </div>
+                <span className={`badge ${table.status === "kosong" ? "badge-success" : "badge-warning"}`}>
+                  {table.status === "kosong" ? "Kosong" : "Terisi"}
+                </span>
+              </div>
+              <div style={{ display: "flex", gap: 8, marginTop: 16 }}>
+                <button className="icon-btn secondary" onClick={() => handleEdit(table)} title="Edit"><Pencil size={15} /></button>
+                <button className="icon-btn danger" onClick={() => handleDelete(table.id)} title="Hapus"><Trash2 size={15} /></button>
+                <button className="icon-btn secondary" onClick={() => setQrTable(table)} title="Lihat QR" style={{ marginLeft: "auto" }}>
+                  <QrCode size={15} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {qrTable && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+          background: "rgba(22,36,26,0.5)", backdropFilter: "blur(2px)",
+          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50,
+          animation: "fadeIn 0.2s ease",
+        }}>
+          <div className="card" style={{ padding: 34, textAlign: "center", maxWidth: 320 }}>
+            <h3 style={{ marginTop: 0 }}>QR Code Meja {qrTable.nomor_meja}</h3>
+            <div style={{ padding: 16, background: "white", borderRadius: 12, display: "inline-block", border: "1px solid var(--border)" }}>
+              <QRCodeSVG value={`${window.location.origin}/order/${qrTable.id}`} size={200} />
+            </div>
+            <p style={{ fontSize: 12, wordBreak: "break-all", marginTop: 14 }}>
+              {window.location.origin}/order/{qrTable.id}
+            </p>
+            <div style={{ marginTop: 16 }}>
+              <button onClick={() => window.print()}>Print</button>
+              <button className="secondary" onClick={() => setQrTable(null)}>Tutup</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

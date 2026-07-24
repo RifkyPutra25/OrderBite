@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { LayoutGrid, Plus, Pencil, Trash2, FolderOpen } from "lucide-react";
 import api from "../../api/axios";
 
 export default function CategoriesPage() {
@@ -60,55 +61,78 @@ export default function CategoriesPage() {
     }
   };
 
-  if (loading) return <p>Memuat...</p>;
-
   return (
     <div>
-      <h2>Kelola Kategori</h2>
+      <div className="page-header">
+        <div>
+          <div className="page-header-icon"><LayoutGrid size={22} /></div>
+          <h2>Kelola Kategori</h2>
+          <p>Atur kategori menu makanan & minuman restoran Anda.</p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: 20 }}>
-        <input
-          type="text"
-          placeholder="Nama kategori"
-          value={namaKategori}
-          onChange={(e) => setNamaKategori(e.target.value)}
-          required
-        />
-        <button type="submit">{editingId ? "Update" : "Tambah"}</button>
-        {editingId && (
-          <button type="button" onClick={handleCancelEdit}>Batal</button>
-        )}
-      </form>
+      <div className="form-card">
+        <h4>{editingId ? "Edit Kategori" : "Tambah Kategori Baru"}</h4>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: "flex", gap: 10, alignItems: "flex-end", flexWrap: "wrap" }}>
+            <div className="form-row" style={{ flex: 1, minWidth: 220, marginBottom: 0 }}>
+              <label>Nama Kategori</label>
+              <input
+                type="text"
+                placeholder="Contoh: Makanan Utama"
+                value={namaKategori}
+                onChange={(e) => setNamaKategori(e.target.value)}
+                required
+              />
+            </div>
+            <div style={{ display: "flex" }}>
+              <button type="submit">
+                {editingId ? <Pencil size={15} /> : <Plus size={15} />}
+                {editingId ? "Update" : "Tambah"}
+              </button>
+              {editingId && (
+                <button type="button" className="secondary" onClick={handleCancelEdit}>Batal</button>
+              )}
+            </div>
+          </div>
+        </form>
+        {error && <p style={{ color: "#dc2626", fontSize: 13, marginTop: 10, marginBottom: 0 }}>{error}</p>}
+      </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nama Kategori</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categories.length === 0 ? (
+      {loading ? (
+        <div className="loading-wrap"><div className="spinner" /> Memuat data...</div>
+      ) : categories.length === 0 ? (
+        <div className="card empty-state">
+          <div className="empty-state-icon"><FolderOpen size={26} /></div>
+          <p>Belum ada kategori. Tambahkan kategori pertama Anda di atas.</p>
+        </div>
+      ) : (
+        <table>
+          <thead>
             <tr>
-              <td colSpan="3" style={{ textAlign: "center" }}>Belum ada kategori</td>
+              <th style={{ width: 60 }}>ID</th>
+              <th>Nama Kategori</th>
+              <th style={{ width: 160 }}>Aksi</th>
             </tr>
-          ) : (
-            categories.map((cat) => (
+          </thead>
+          <tbody>
+            {categories.map((cat) => (
               <tr key={cat.id}>
-                <td>{cat.id}</td>
-                <td>{cat.nama_kategori}</td>
+                <td><span className="badge badge-neutral">#{cat.id}</span></td>
+                <td style={{ fontWeight: 600 }}>{cat.nama_kategori}</td>
                 <td>
-                  <button onClick={() => handleEdit(cat)}>Edit</button>
-                  <button onClick={() => handleDelete(cat.id)}>Hapus</button>
+                  <button className="icon-btn secondary" onClick={() => handleEdit(cat)} title="Edit">
+                    <Pencil size={15} />
+                  </button>
+                  <button className="icon-btn danger" onClick={() => handleDelete(cat.id)} title="Hapus">
+                    <Trash2 size={15} />
+                  </button>
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

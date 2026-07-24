@@ -1,8 +1,9 @@
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
-import { LayoutGrid, UtensilsCrossed, Table2, Users, BarChart3, LogOut, Store } from "lucide-react";
+import { LayoutDashboard, LayoutGrid, UtensilsCrossed, Table2, Users, BarChart3, LogOut, Store } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const NAV_ITEMS = [
+  { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/categories", label: "Kategori", icon: LayoutGrid },
   { to: "/admin/menu-items", label: "Menu", icon: UtensilsCrossed },
   { to: "/admin/tables", label: "Meja", icon: Table2 },
@@ -42,11 +43,7 @@ export default function AdminLayout() {
             const Icon = item.icon;
             const isActive = location.pathname.startsWith(item.to);
             return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={`sidebar-link ${isActive ? "active" : ""}`}
-              >
+              <Link key={item.to} to={item.to} className={`sidebar-link ${isActive ? "active" : ""}`}>
                 <Icon size={18} />
                 {item.label}
               </Link>
@@ -55,9 +52,7 @@ export default function AdminLayout() {
         </nav>
 
         <button className="sidebar-logout" onClick={handleLogout}>
-          <span style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center" }}>
-            <LogOut size={16} /> Logout
-          </span>
+          <LogOut size={16} /> Logout
         </button>
       </aside>
 

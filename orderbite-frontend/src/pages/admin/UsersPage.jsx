@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Users, Plus, Trash2, UserRound } from "lucide-react";
 import api from "../../api/axios";
 
 export default function UsersPage() {
@@ -48,49 +49,84 @@ export default function UsersPage() {
     }
   };
 
-  if (loading) return <p>Memuat...</p>;
-
   return (
     <div>
-      <h2>Kelola Akun Kasir/Dapur</h2>
+      <div className="page-header">
+        <div>
+          <div className="page-header-icon"><Users size={22} /></div>
+          <h2>Kelola Akun Kasir/Dapur</h2>
+          <p>Buat dan kelola akun untuk staf Kasir dan Dapur.</p>
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: 20, display: "flex", flexDirection: "column", gap: 8, maxWidth: 300 }}>
-        <input type="text" name="name" placeholder="Nama" value={form.name} onChange={handleChange} required />
-        <input type="email" name="email" placeholder="Email" value={form.email} onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Password" value={form.password} onChange={handleChange} required minLength={6} />
-        <select name="role" value={form.role} onChange={handleChange}>
-          <option value="kasir">Kasir</option>
-          <option value="dapur">Dapur</option>
-        </select>
-        <button type="submit">Buat Akun</button>
-      </form>
+      <div className="form-card">
+        <h4>Buat Akun Baru</h4>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div className="form-row">
+              <label>Nama</label>
+              <input type="text" name="name" placeholder="Nama lengkap" value={form.name} onChange={handleChange} required />
+            </div>
+            <div className="form-row">
+              <label>Email</label>
+              <input type="email" name="email" placeholder="email@orderbite.com" value={form.email} onChange={handleChange} required />
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <div className="form-row">
+              <label>Password</label>
+              <input type="password" name="password" placeholder="Minimal 6 karakter" value={form.password} onChange={handleChange} required minLength={6} />
+            </div>
+            <div className="form-row">
+              <label>Role</label>
+              <select name="role" value={form.role} onChange={handleChange}>
+                <option value="kasir">Kasir</option>
+                <option value="dapur">Dapur</option>
+              </select>
+            </div>
+          </div>
+          <div className="form-actions">
+            <button type="submit"><Plus size={15} /> Buat Akun</button>
+          </div>
+        </form>
+        {error && <p style={{ color: "#dc2626", fontSize: 13, marginTop: 10, marginBottom: 0 }}>{error}</p>}
+      </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.length === 0 ? (
-            <tr><td colSpan="4" style={{ textAlign: "center" }}>Belum ada akun</td></tr>
-          ) : (
-            users.map((u) => (
+      {loading ? (
+        <div className="loading-wrap"><div className="spinner" /> Memuat data...</div>
+      ) : users.length === 0 ? (
+        <div className="card empty-state">
+          <div className="empty-state-icon"><UserRound size={26} /></div>
+          <p>Belum ada akun Kasir/Dapur. Buat akun pertama di atas.</p>
+        </div>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th style={{ width: 70 }}>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((u) => (
               <tr key={u.id}>
-                <td>{u.name}</td>
+                <td style={{ fontWeight: 600 }}>{u.name}</td>
                 <td>{u.email}</td>
-                <td>{u.role}</td>
-                <td><button onClick={() => handleDelete(u.id)}>Hapus</button></td>
+                <td>
+                  <span className={`badge ${u.role === "kasir" ? "badge-warning" : "badge-danger"}`}>
+                    {u.role === "kasir" ? "Kasir" : "Dapur"}
+                  </span>
+                </td>
+                <td>
+                  <button className="icon-btn danger" onClick={() => handleDelete(u.id)} title="Hapus"><Trash2 size={15} /></button>
+                </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

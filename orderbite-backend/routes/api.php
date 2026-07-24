@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('menu-items', MenuItemController::class)->except(['index', 'show']);
         Route::apiResource('tables', RestoTableController::class)->except(['index', 'show']);
         Route::apiResource('users', UserController::class)->only(['index', 'store', 'destroy']);
+        Route::get('/reports/dashboard', [ReportController::class, 'dashboard']);
         Route::get('/reports/summary', [ReportController::class, 'summary']);
         Route::get('/reports/weekly-revenue', [ReportController::class, 'weeklyRevenue']);
         Route::get('/reports/best-sellers', [ReportController::class, 'bestSellers']);

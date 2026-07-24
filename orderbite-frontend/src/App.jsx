@@ -4,6 +4,7 @@ import AdminLayout from "./components/AdminLayout";
 import KasirDashboard from "./pages/KasirDashboard";
 import DapurDashboard from "./pages/DapurDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardPage from "./pages/admin/DashboardPage";
 import CategoriesPage from "./pages/admin/CategoriesPage";
 import MenuItemsPage from "./pages/admin/MenuItemsPage";
 import TablesPage from "./pages/admin/TablesPage";
@@ -29,7 +30,8 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="categories" />} />
+        <Route index element={<Navigate to="dashboard" />} />
+        <Route path="dashboard" element={<DashboardPage />} />
         <Route path="categories" element={<CategoriesPage />} />
         <Route path="menu-items" element={<MenuItemsPage />} />
         <Route path="tables" element={<TablesPage />} />

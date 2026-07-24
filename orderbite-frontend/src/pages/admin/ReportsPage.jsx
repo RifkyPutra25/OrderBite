@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { BarChart3, TrendingUp, Award, Receipt } from "lucide-react";
 import api from "../../api/axios";
 
 export default function ReportsPage() {
@@ -33,102 +34,108 @@ export default function ReportsPage() {
 
   const formatRupiah = (num) => `Rp ${Number(num).toLocaleString("id-ID")}`;
 
-  if (loading) return <p>Memuat laporan...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading) return <div className="loading-wrap"><div className="spinner" /> Memuat laporan...</div>;
+  if (error) return <p style={{ color: "#dc2626" }}>{error}</p>;
 
   const maxRevenue = Math.max(...weeklyRevenue.map((d) => Number(d.total)), 1);
 
   return (
     <div>
-      <h2>Laporan Penjualan</h2>
-
-      {/* Ringkasan */}
-      <div style={{ display: "flex", gap: 15, marginBottom: 30, flexWrap: "wrap" }}>
-        <div className="card" style={{ minWidth: 180 }}>
-          <p style={{ margin: 0, fontSize: 13, color: "#666" }}>Pendapatan Hari Ini</p>
-          <h3 style={{ margin: "5px 0" }}>{formatRupiah(summary.today_revenue)}</h3>
-          <p style={{ margin: 0, fontSize: 12, color: "#888" }}>{summary.today_orders} pesanan</p>
-        </div>
-        <div className="card" style={{ minWidth: 180 }}>
-          <p style={{ margin: 0, fontSize: 13, color: "#666" }}>Pendapatan Bulan Ini</p>
-          <h3 style={{ margin: "5px 0" }}>{formatRupiah(summary.month_revenue)}</h3>
-          <p style={{ margin: 0, fontSize: 12, color: "#888" }}>{summary.month_orders} pesanan</p>
+      <div className="page-header">
+        <div>
+          <div className="page-header-icon"><BarChart3 size={22} /></div>
+          <h2>Laporan Penjualan</h2>
+          <p>Pantau performa penjualan restoran Anda.</p>
         </div>
       </div>
 
-      {/* Grafik 7 hari terakhir */}
-      <div className="card" style={{ marginBottom: 30 }}>
-        <h3 style={{ marginTop: 0 }}>Pendapatan 7 Hari Terakhir</h3>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
+        <div className="card">
+          <p style={{ margin: 0, fontSize: 13 }}>Pendapatan Hari Ini</p>
+          <h3 style={{ margin: "6px 0 0" }}>{formatRupiah(summary.today_revenue)}</h3>
+          <p style={{ margin: "4px 0 0", fontSize: 12 }}>{summary.today_orders} pesanan</p>
+        </div>
+        <div className="card">
+          <p style={{ margin: 0, fontSize: 13 }}>Pendapatan Bulan Ini</p>
+          <h3 style={{ margin: "6px 0 0" }}>{formatRupiah(summary.month_revenue)}</h3>
+          <p style={{ margin: "4px 0 0", fontSize: 12 }}>{summary.month_orders} pesanan</p>
+        </div>
+      </div>
+
+      <div className="card" style={{ marginBottom: 24 }}>
+        <h4 style={{ margin: "0 0 4px", display: "flex", alignItems: "center", gap: 8, fontSize: 15 }}>
+          <TrendingUp size={17} /> Pendapatan 7 Hari Terakhir
+        </h4>
         {weeklyRevenue.length === 0 ? (
-          <p>Belum ada data</p>
+          <p style={{ fontSize: 13 }}>Belum ada data</p>
         ) : (
-          <div style={{ display: "flex", gap: 10, alignItems: "flex-end", height: 150, borderBottom: "1px solid #ddd", padding: "0 10px" }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "flex-end", height: 160, marginTop: 20, padding: "0 6px" }}>
             {weeklyRevenue.map((d) => (
               <div key={d.tanggal} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1 }}>
                 <div style={{
                   width: "100%",
-                  background: "#3b82f6",
-                  height: `${(Number(d.total) / maxRevenue) * 120}px`,
-                  borderRadius: "4px 4px 0 0",
+                  background: "linear-gradient(180deg, #a9cba3, #4f8a5c)",
+                  height: `${(Number(d.total) / maxRevenue) * 130}px`,
+                  borderRadius: "6px 6px 0 0",
+                  minHeight: 4,
                 }} title={formatRupiah(d.total)} />
-                <span style={{ fontSize: 11, marginTop: 4 }}>{d.tanggal.slice(5)}</span>
+                <span style={{ fontSize: 11, marginTop: 6, color: "var(--text-muted)" }}>{d.tanggal.slice(5)}</span>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Menu Terlaris */}
-      <div className="card" style={{ marginBottom: 30, maxWidth: 420 }}>
-        <h3 style={{ marginTop: 0 }}>Menu Terlaris</h3>
+      <div className="card" style={{ marginBottom: 24, maxWidth: 460 }}>
+        <h4 style={{ margin: "0 0 4px", display: "flex", alignItems: "center", gap: 8, fontSize: 15 }}>
+          <Award size={17} /> Menu Terlaris
+        </h4>
         {bestSellers.length === 0 ? (
-          <p>Belum ada data</p>
+          <p style={{ fontSize: 13 }}>Belum ada data</p>
         ) : (
-          <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
-            <thead>
-              <tr><th>Menu</th><th>Terjual</th></tr>
-            </thead>
-            <tbody>
-              {bestSellers.map((item, i) => (
-                <tr key={i}>
-                  <td>{item.nama}</td>
-                  <td>{item.total_terjual}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div style={{ marginTop: 12 }}>
+            {bestSellers.map((item, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 0", borderBottom: i < bestSellers.length - 1 ? "1px solid var(--border)" : "none" }}>
+                <span style={{ fontSize: 14 }}><strong style={{ color: "var(--primary-dark)" }}>#{i + 1}</strong> &nbsp;{item.nama}</span>
+                <span className="badge badge-neutral">{item.total_terjual} terjual</span>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* Riwayat Transaksi */}
       <div className="card">
-        <h3 style={{ marginTop: 0 }}>Riwayat Transaksi (Lunas)</h3>
-        <table border="1" cellPadding="8" style={{ borderCollapse: "collapse", width: "100%" }}>
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Meja</th>
-              <th>Customer</th>
-              <th>Items</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.length === 0 ? (
-              <tr><td colSpan="5" style={{ textAlign: "center" }}>Belum ada transaksi</td></tr>
-            ) : (
-              transactions.map((trx) => (
-                <tr key={trx.id}>
-                  <td>{new Date(trx.created_at).toLocaleString("id-ID")}</td>
-                  <td>{trx.table?.nomor_meja}</td>
-                  <td>{trx.nama_customer}</td>
-                  <td>{trx.items?.map((i) => `${i.menu_item?.nama} x${i.qty}`).join(", ")}</td>
-                  <td>{formatRupiah(trx.total_harga)}</td>
+        <h4 style={{ margin: "0 0 4px", display: "flex", alignItems: "center", gap: 8, fontSize: 15 }}>
+          <Receipt size={17} /> Riwayat Transaksi (Lunas)
+        </h4>
+        {transactions.length === 0 ? (
+          <p style={{ fontSize: 13 }}>Belum ada transaksi</p>
+        ) : (
+          <div style={{ marginTop: 12, overflowX: "auto" }}>
+            <table style={{ boxShadow: "none", border: "none" }}>
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Meja</th>
+                  <th>Customer</th>
+                  <th>Items</th>
+                  <th>Total</th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {transactions.map((trx) => (
+                  <tr key={trx.id}>
+                    <td>{new Date(trx.created_at).toLocaleString("id-ID")}</td>
+                    <td>{trx.table?.nomor_meja}</td>
+                    <td>{trx.nama_customer}</td>
+                    <td style={{ fontSize: 13 }}>{trx.items?.map((i) => `${i.menu_item?.nama} x${i.qty}`).join(", ")}</td>
+                    <td style={{ fontWeight: 600 }}>{formatRupiah(trx.total_harga)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

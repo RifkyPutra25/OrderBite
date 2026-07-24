@@ -74,4 +74,26 @@ class ReportController extends Controller
 
         return $query->paginate(20);
     }
+    public function dashboard()
+{
+    $activeOrders = \App\Models\Order::where('status_pembayaran', 'belum_bayar')->count();
+    $tablesOccupied = \App\Models\RestoTable::where('status', 'terisi')->count();
+    $tablesTotal = \App\Models\RestoTable::count();
+    $menuUnavailable = \App\Models\MenuItem::where('tersedia', false)->count();
+    $pendingKitchenItems = \App\Models\OrderItem::whereIn('status', ['pending', 'dimasak'])->count();
+
+    $recentOrders = \App\Models\Order::with('table')
+        ->orderBy('created_at', 'desc')
+        ->limit(5)
+        ->get();
+
+    return response()->json([
+        'active_orders' => $activeOrders,
+        'tables_occupied' => $tablesOccupied,
+        'tables_total' => $tablesTotal,
+        'menu_unavailable' => $menuUnavailable,
+        'pending_kitchen_items' => $pendingKitchenItems,
+        'recent_orders' => $recentOrders,
+    ]);
+}
 }
