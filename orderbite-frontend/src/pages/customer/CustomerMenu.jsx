@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ShoppingBag, Plus, Minus, X } from "lucide-react";
 import publicApi from "../../api/publicAxios";
 
 export default function CustomerMenu() {
@@ -50,10 +51,7 @@ export default function CustomerMenu() {
   };
 
   const updateQty = (menuItemId, delta) => {
-    setCart(cart
-      .map((c) => c.menu_item_id === menuItemId ? { ...c, qty: c.qty + delta } : c)
-      .filter((c) => c.qty > 0)
-    );
+    setCart(cart.map((c) => c.menu_item_id === menuItemId ? { ...c, qty: c.qty + delta } : c).filter((c) => c.qty > 0));
   };
 
   const updateNote = (menuItemId, catatan) => {
@@ -61,6 +59,7 @@ export default function CustomerMenu() {
   };
 
   const total = cart.reduce((sum, c) => sum + c.harga * c.qty, 0);
+  const cartCount = cart.reduce((sum, c) => sum + c.qty, 0);
 
   const handleCheckout = async () => {
     if (cart.length === 0) return;
@@ -81,88 +80,88 @@ export default function CustomerMenu() {
     }
   };
 
-  if (loading) return <p style={{ padding: 20 }}>Memuat...</p>;
-  if (error && !table) return <p style={{ padding: 20, color: "red" }}>{error}</p>;
+  if (loading) return <div className="loading-wrap" style={{ padding: 40, justifyContent: "center" }}><div className="spinner" /> Memuat...</div>;
+  if (error && !table) return <p style={{ padding: 20, color: "#dc2626", textAlign: "center" }}>{error}</p>;
 
   if (!customerName) {
     return (
-      <div className="login-container">
-        <h2>Selamat datang di OrderBite</h2>
-        <p>Meja: <strong>{table?.nomor_meja}</strong></p>
-        <form onSubmit={handleSetName}>
-          <input
-            type="text"
-            placeholder="Masukkan nama Anda"
-            value={nameInput}
-            onChange={(e) => setNameInput(e.target.value)}
-            required
-          />
-          <button type="submit">Lanjut ke Menu</button>
-        </form>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #a9cba3 0%, #4f8a5c 100%)" }}>
+        <div className="login-container" style={{ margin: 0 }}>
+          <h2>🍽️ Selamat Datang</h2>
+          <p style={{ marginBottom: 0 }}>Meja: <strong style={{ color: "var(--text)" }}>{table?.nomor_meja}</strong></p>
+          <form onSubmit={handleSetName}>
+            <input type="text" placeholder="Masukkan nama Anda" value={nameInput} onChange={(e) => setNameInput(e.target.value)} required />
+            <button type="submit">Lanjut ke Menu</button>
+          </form>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: 20, maxWidth: 600, margin: "0 auto", paddingBottom: 120 }}>
-      <h2>Menu — Meja {table?.nomor_meja}</h2>
-      <p>Halo, {customerName}!</p>
+    <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: cart.length > 0 ? 140 : 30 }}>
+      <div style={{ background: "linear-gradient(135deg, #a9cba3, #4f8a5c)", color: "white", padding: "28px 20px", borderRadius: "0 0 20px 20px", marginBottom: 20 }}>
+        <p style={{ margin: 0, opacity: 0.9, fontSize: 13 }}>Meja {table?.nomor_meja}</p>
+        <h2 style={{ margin: "4px 0 0", color: "white" }}>Halo, {customerName}! 👋</h2>
+      </div>
 
-      {categories.map((cat) => (
-        <div key={cat.id} style={{ marginBottom: 25 }}>
-          <h3>{cat.nama_kategori}</h3>
-          {(!cat.menu_items || cat.menu_items.length === 0) ? (
-            <p style={{ color: "#888" }}>Belum ada menu di kategori ini</p>
-          ) : (
-            cat.menu_items.map((item) => (
-              <div key={item.id} className="card" style={{ marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <strong>{item.nama}</strong>
-                  <p style={{ margin: "4px 0", fontSize: 13, color: "#666" }}>{item.deskripsi}</p>
-                  <span>Rp {Number(item.harga).toLocaleString("id-ID")}</span>
+      <div style={{ padding: "0 20px" }}>
+        {categories.map((cat) => (
+          <div key={cat.id} style={{ marginBottom: 26 }}>
+            <h3 style={{ fontSize: 17, marginBottom: 12 }}>{cat.nama_kategori}</h3>
+            {(!cat.menu_items || cat.menu_items.length === 0) ? (
+              <p style={{ fontSize: 13 }}>Belum ada menu di kategori ini</p>
+            ) : (
+              cat.menu_items.map((item) => (
+                <div key={item.id} className="card" style={{ marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <div style={{ display: "flex", gap: 12, alignItems: "center", flex: 1 }}>
+                    {item.foto_full_url && (
+                      <img src={item.foto_full_url} alt={item.nama} style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 10, flexShrink: 0 }} />
+                    )}
+                    <div>
+                      <strong style={{ fontSize: 14.5 }}>{item.nama}</strong>
+                      <p style={{ margin: "3px 0", fontSize: 12.5 }}>{item.deskripsi}</p>
+                      <span style={{ fontWeight: 700, color: "var(--primary-dark)", fontSize: 14 }}>Rp {Number(item.harga).toLocaleString("id-ID")}</span>
+                    </div>
+                  </div>
+                  <button className="icon-btn" onClick={() => addToCart(item)}><Plus size={16} /></button>
                 </div>
-                <button onClick={() => addToCart(item)}>+ Tambah</button>
-              </div>
-            ))
-          )}
-        </div>
-      ))}
+              ))
+            )}
+          </div>
+        ))}
+      </div>
 
       {cart.length > 0 && (
         <div style={{
           position: "fixed", bottom: 0, left: 0, right: 0,
-          background: "white", borderTop: "2px solid #ddd", padding: 15,
-          maxHeight: "40vh", overflowY: "auto",
-          boxShadow: "0 -4px 12px rgba(0,0,0,0.1)",
+          background: "white", padding: 18, maxHeight: "45vh", overflowY: "auto",
+          boxShadow: "0 -8px 24px rgba(22,36,26,0.12)", borderRadius: "20px 20px 0 0",
         }}>
-          <h4>Keranjang</h4>
+          <h4 style={{ margin: "0 0 12px", display: "flex", alignItems: "center", gap: 8 }}>
+            <ShoppingBag size={17} /> Keranjang ({cartCount})
+          </h4>
           {cart.map((c) => (
-            <div key={c.menu_item_id} style={{ marginBottom: 8 }}>
+            <div key={c.menu_item_id} style={{ marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span>{c.nama}</span>
-                <span>
-                  <button onClick={() => updateQty(c.menu_item_id, -1)}>-</button>
-                  {" "}{c.qty}{" "}
-                  <button onClick={() => updateQty(c.menu_item_id, 1)}>+</button>
-                  {" "}Rp {(c.harga * c.qty).toLocaleString("id-ID")}
+                <span style={{ fontSize: 13.5 }}>{c.nama}</span>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <button className="icon-btn secondary" style={{ padding: 4 }} onClick={() => updateQty(c.menu_item_id, -1)}><Minus size={12} /></button>
+                  {c.qty}
+                  <button className="icon-btn secondary" style={{ padding: 4 }} onClick={() => updateQty(c.menu_item_id, 1)}><Plus size={12} /></button>
+                  <span style={{ fontWeight: 600, minWidth: 70, textAlign: "right" }}>Rp {(c.harga * c.qty).toLocaleString("id-ID")}</span>
                 </span>
               </div>
-              <input
-                type="text"
-                placeholder="Catatan (opsional)"
-                value={c.catatan}
-                onChange={(e) => updateNote(c.menu_item_id, e.target.value)}
-                style={{ width: "100%", fontSize: 12, marginTop: 4 }}
-              />
+              <input type="text" placeholder="Catatan (opsional)" value={c.catatan} onChange={(e) => updateNote(c.menu_item_id, e.target.value)} style={{ marginTop: 4, fontSize: 12, padding: "6px 10px" }} />
             </div>
           ))}
-          <hr />
-          <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold" }}>
+          <hr style={{ border: "none", borderTop: "1px solid var(--border)" }} />
+          <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 15 }}>
             <span>Total</span>
             <span>Rp {total.toLocaleString("id-ID")}</span>
           </div>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          <button onClick={handleCheckout} disabled={submitting} style={{ width: "100%", marginTop: 10, padding: 10 }}>
+          {error && <p style={{ color: "#dc2626", fontSize: 13 }}>{error}</p>}
+          <button onClick={handleCheckout} disabled={submitting} style={{ width: "100%", justifyContent: "center", marginTop: 12, padding: 12 }}>
             {submitting ? "Memproses..." : "Checkout"}
           </button>
         </div>
