@@ -13,7 +13,12 @@ export function AuthProvider({ children }) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       api.get("/me")
         .then((res) => setUser(res.data))
-        .catch(() => logout())
+        .catch(() => {
+          setUser(null);
+          setToken(null);
+          localStorage.removeItem("token");
+          delete api.defaults.headers.common["Authorization"];
+        })
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
@@ -32,7 +37,9 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     try {
       await api.post("/logout");
-    } catch (e) {}
+    } catch (e) {
+      // abaikan error saat logout, tetap bersihkan state lokal
+    }
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");
