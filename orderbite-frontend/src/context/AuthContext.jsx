@@ -10,14 +10,12 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (token) {
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       api.get("/me")
         .then((res) => setUser(res.data))
         .catch(() => {
           setUser(null);
           setToken(null);
           localStorage.removeItem("token");
-          delete api.defaults.headers.common["Authorization"];
         })
         .finally(() => setLoading(false));
     } else {
@@ -27,23 +25,19 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await api.post("/login", { email, password });
+    localStorage.setItem("token", res.data.token);
     setToken(res.data.token);
     setUser(res.data.user);
-    localStorage.setItem("token", res.data.token);
-    api.defaults.headers.common["Authorization"] = `Bearer ${res.data.token}`;
     return res.data.user;
   };
 
   const logout = async () => {
     try {
       await api.post("/logout");
-    } catch (e) {
-      // abaikan error saat logout, tetap bersihkan state lokal
-    }
+    } catch (e) {}
     setUser(null);
     setToken(null);
     localStorage.removeItem("token");
-    delete api.defaults.headers.common["Authorization"];
   };
 
   return (
