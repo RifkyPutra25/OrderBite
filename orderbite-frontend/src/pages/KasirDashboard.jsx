@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { LogOut, Store, ShoppingCart, X } from "lucide-react";
 import api from "../api/axios";
 import echo from "../echo";
+import LoadingScreen from "../components/LoadingScreen";
 
 export default function KasirDashboard() {
   const { user, logout } = useAuth();
@@ -102,8 +103,7 @@ export default function KasirDashboard() {
     }
   };
 
-  if (loading) return <div className="loading-wrap" style={{ padding: 40 }}><div className="spinner" /> Memuat...</div>;
-
+ if (loading) return <LoadingScreen />;
   return (
     <div>
       <div className="dashboard-header">

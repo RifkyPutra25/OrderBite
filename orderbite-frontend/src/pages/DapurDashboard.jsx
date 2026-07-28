@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { LogOut, ChefHat, Flame, CheckCircle2 } from "lucide-react";
 import api from "../api/axios";
 import echo from "../echo";
+import LoadingScreen from "../components/LoadingScreen";
 
 export default function DapurDashboard() {
   const { user, logout } = useAuth();
@@ -46,7 +47,7 @@ export default function DapurDashboard() {
     }
   };
 
-  if (loading) return <div className="loading-wrap" style={{ padding: 40 }}><div className="spinner" /> Memuat...</div>;
+  if (loading) return <LoadingScreen />;
 
   const pendingItems = orders.flatMap((order) =>
     (order.items || [])

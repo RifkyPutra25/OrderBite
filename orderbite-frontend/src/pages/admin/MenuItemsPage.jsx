@@ -176,7 +176,7 @@ export default function MenuItemsPage() {
       </div>
 
       {loading ? (
-        <div className="loading-wrap"><div className="spinner" /> Memuat data...</div>
+        <div className="loading-wrap"><div className="spinner" /></div>
       ) : menuItems.length === 0 ? (
         <div className="card empty-state">
           <div className="empty-state-icon"><PackageOpen size={26} /></div>

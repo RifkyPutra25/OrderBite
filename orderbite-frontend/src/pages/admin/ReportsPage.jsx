@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { BarChart3, TrendingUp, Award, Receipt } from "lucide-react";
 import api from "../../api/axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function ReportsPage() {
   const [summary, setSummary] = useState(null);
@@ -11,30 +12,25 @@ export default function ReportsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        const [summaryRes, weeklyRes, bestRes, transRes] = await Promise.all([
-          api.get("/reports/summary"),
-          api.get("/reports/weekly-revenue"),
-          api.get("/reports/best-sellers"),
-          api.get("/reports/transactions"),
-        ]);
-        setSummary(summaryRes.data);
-        setWeeklyRevenue(weeklyRes.data);
-        setBestSellers(bestRes.data);
-        setTransactions(transRes.data.data || []);
-      } catch (err) {
-        setError("Gagal memuat laporan");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAll();
-  }, []);
+  const fetchAll = async () => {
+    try {
+      const res = await api.get("/reports/full");
+      setSummary(res.data.summary);
+      setWeeklyRevenue(res.data.weekly_revenue);
+      setBestSellers(res.data.best_sellers);
+      setTransactions(res.data.transactions.data || []);
+    } catch (err) {
+      setError("Gagal memuat laporan");
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchAll();
+}, []);
 
   const formatRupiah = (num) => `Rp ${Number(num).toLocaleString("id-ID")}`;
 
-  if (loading) return <div className="loading-wrap"><div className="spinner" /> Memuat laporan...</div>;
+ if (loading) return <LoadingScreen />;
   if (error) return <p style={{ color: "#dc2626" }}>{error}</p>;
 
   const maxRevenue = Math.max(...weeklyRevenue.map((d) => Number(d.total)), 1);

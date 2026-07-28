@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { LayoutDashboard, Wallet, ShoppingBag, Table2, ChefHat, AlertCircle, TrendingUp, Clock } from "lucide-react";
 import api from "../../api/axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState(null);
@@ -10,28 +11,24 @@ export default function DashboardPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        const [summaryRes, dashRes, weeklyRes] = await Promise.all([
-          api.get("/reports/summary"),
-          api.get("/reports/dashboard"),
-          api.get("/reports/weekly-revenue"),
-        ]);
-        setSummary(summaryRes.data);
-        setDashboard(dashRes.data);
-        setWeeklyRevenue(weeklyRes.data);
-      } catch (err) {
-        setError("Gagal memuat dashboard");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAll();
-  }, []);
+  const fetchAll = async () => {
+    try {
+      const res = await api.get("/reports/overview");
+      setSummary(res.data.summary);
+      setDashboard(res.data.dashboard);
+      setWeeklyRevenue(res.data.weekly_revenue);
+    } catch (err) {
+      setError("Gagal memuat dashboard");
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchAll();
+}, []);
 
   const formatRupiah = (num) => `Rp ${Number(num).toLocaleString("id-ID")}`;
 
-  if (loading) return <div className="loading-wrap"><div className="spinner" /> Memuat dashboard...</div>;
+  if (loading) return <LoadingScreen />;
   if (error) return <p style={{ color: "#dc2626" }}>{error}</p>;
 
   const maxRevenue = Math.max(...weeklyRevenue.map((d) => Number(d.total)), 1);
@@ -53,7 +50,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stat Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16, marginBottom: 24 }}>
         {statCards.map((s) => {
           const Icon = s.icon;
@@ -81,7 +77,6 @@ export default function DashboardPage() {
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 20, alignItems: "start" }}>
-        {/* Grafik */}
         <div className="card">
           <h4 style={{ margin: "0 0 4px", display: "flex", alignItems: "center", gap: 8, fontSize: 15 }}>
             <TrendingUp size={17} /> Pendapatan 7 Hari Terakhir
@@ -98,7 +93,6 @@ export default function DashboardPage() {
                     height: `${(Number(d.total) / maxRevenue) * 130}px`,
                     borderRadius: "6px 6px 0 0",
                     minHeight: 4,
-                    transition: "height 0.3s ease",
                   }} title={formatRupiah(d.total)} />
                   <span style={{ fontSize: 11, marginTop: 6, color: "var(--text-muted)" }}>{d.tanggal.slice(5)}</span>
                 </div>
@@ -107,7 +101,6 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Pesanan Terbaru */}
         <div className="card">
           <h4 style={{ margin: "0 0 4px", display: "flex", alignItems: "center", gap: 8, fontSize: 15 }}>
             <Clock size={17} /> Pesanan Terbaru
