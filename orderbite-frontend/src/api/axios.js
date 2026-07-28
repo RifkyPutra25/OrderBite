@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
-  timeout: 8000,
+  baseURL: "http://orderbite-backend.test/api",
+  timeout: 15000,
   headers: {
     "Accept": "application/json",
   },

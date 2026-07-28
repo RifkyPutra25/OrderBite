@@ -22,10 +22,16 @@ export default function Login() {
       else if (user.role === "kasir") navigate("/kasir");
       else if (user.role === "dapur") navigate("/dapur");
     } catch (err) {
-      setError("Email atau password salah");
-    } finally {
-      setLoading(false);
-    }
+  if (err.code === "ECONNABORTED") {
+    setError("Server sedang sibuk, silakan coba lagi.");
+  } else if (err.response?.status === 422) {
+    setError("Email atau password salah");
+  } else {
+    setError("Terjadi kesalahan koneksi, silakan coba lagi.");
+  }
+} finally {
+  setLoading(false);
+}
   };
 
   return (
