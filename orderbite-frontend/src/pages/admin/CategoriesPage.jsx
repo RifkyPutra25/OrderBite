@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { LayoutGrid, Plus, Pencil, Trash2, FolderOpen } from "lucide-react";
+import { Tags, Plus, Pencil, Trash2, FolderOpen } from "lucide-react";
 import api from "../../api/axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState([]);
@@ -61,11 +62,13 @@ export default function CategoriesPage() {
     }
   };
 
+  if (loading) return <LoadingScreen />;
+
   return (
     <div>
       <div className="page-header">
         <div>
-          <div className="page-header-icon"><LayoutGrid size={22} /></div>
+          <div className="page-header-icon"><Tags size={22} /></div>
           <h2>Kelola Kategori</h2>
           <p>Atur kategori menu makanan & minuman restoran Anda.</p>
         </div>
@@ -99,9 +102,7 @@ export default function CategoriesPage() {
         {error && <p style={{ color: "#dc2626", fontSize: 13, marginTop: 10, marginBottom: 0 }}>{error}</p>}
       </div>
 
-      {loading ? (
-        <div className="loading-wrap"><div className="spinner" /> Memuat data...</div>
-      ) : categories.length === 0 ? (
+      {categories.length === 0 ? (
         <div className="card empty-state">
           <div className="empty-state-icon"><FolderOpen size={26} /></div>
           <p>Belum ada kategori. Tambahkan kategori pertama Anda di atas.</p>

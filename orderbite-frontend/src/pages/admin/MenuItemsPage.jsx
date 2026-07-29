@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { UtensilsCrossed, Plus, Pencil, Trash2, ImageOff, PackageOpen } from "lucide-react";
 import api from "../../api/axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function MenuItemsPage() {
   const [menuItems, setMenuItems] = useState([]);
@@ -103,6 +104,8 @@ export default function MenuItemsPage() {
     }
   };
 
+  if (loading) return <LoadingScreen />;
+
   return (
     <div>
       <div className="page-header">
@@ -175,9 +178,7 @@ export default function MenuItemsPage() {
         {error && <p style={{ color: "#dc2626", fontSize: 13, marginTop: 10, marginBottom: 0 }}>{error}</p>}
       </div>
 
-      {loading ? (
-        <div className="loading-wrap"><div className="spinner" /></div>
-      ) : menuItems.length === 0 ? (
+      {menuItems.length === 0 ? (
         <div className="card empty-state">
           <div className="empty-state-icon"><PackageOpen size={26} /></div>
           <p>Belum ada menu. Tambahkan menu pertama Anda di atas.</p>

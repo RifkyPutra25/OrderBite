@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Table2, Plus, Pencil, Trash2, QrCode, LayoutGrid } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import api from "../../api/axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function TablesPage() {
   const [tables, setTables] = useState([]);
@@ -66,6 +67,8 @@ export default function TablesPage() {
     }
   };
 
+  if (loading) return <LoadingScreen />;
+
   return (
     <div>
       <div className="page-header">
@@ -100,9 +103,7 @@ export default function TablesPage() {
         {error && <p style={{ color: "#dc2626", fontSize: 13, marginTop: 10, marginBottom: 0 }}>{error}</p>}
       </div>
 
-      {loading ? (
-        <div className="loading-wrap"><div className="spinner" /> Memuat data...</div>
-      ) : tables.length === 0 ? (
+      {tables.length === 0 ? (
         <div className="card empty-state">
           <div className="empty-state-icon"><LayoutGrid size={26} /></div>
           <p>Belum ada meja. Tambahkan meja pertama Anda di atas.</p>
@@ -137,7 +138,6 @@ export default function TablesPage() {
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
           background: "rgba(22,36,26,0.5)", backdropFilter: "blur(2px)",
           display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50,
-          animation: "fadeIn 0.2s ease",
         }}>
           <div className="card" style={{ padding: 34, textAlign: "center", maxWidth: 320 }}>
             <h3 style={{ marginTop: 0 }}>QR Code Meja {qrTable.nomor_meja}</h3>

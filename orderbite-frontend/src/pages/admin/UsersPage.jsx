@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Users, Plus, Trash2, UserRound } from "lucide-react";
 import api from "../../api/axios";
+import LoadingScreen from "../../components/LoadingScreen";
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -49,6 +50,8 @@ export default function UsersPage() {
     }
   };
 
+  if (loading) return <LoadingScreen />;
+
   return (
     <div>
       <div className="page-header">
@@ -92,9 +95,7 @@ export default function UsersPage() {
         {error && <p style={{ color: "#dc2626", fontSize: 13, marginTop: 10, marginBottom: 0 }}>{error}</p>}
       </div>
 
-      {loading ? (
-        <div className="loading-wrap"><div className="spinner" /> Memuat data...</div>
-      ) : users.length === 0 ? (
+      {users.length === 0 ? (
         <div className="card empty-state">
           <div className="empty-state-icon"><UserRound size={26} /></div>
           <p>Belum ada akun Kasir/Dapur. Buat akun pertama di atas.</p>
