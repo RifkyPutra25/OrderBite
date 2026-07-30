@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -17,7 +18,9 @@ Route::prefix('public')->group(function () {
     Route::get('/menu', [CustomerController::class, 'getMenu']);
     Route::post('/orders', [CustomerController::class, 'createOrder']);
     Route::get('/orders/{id}', [CustomerController::class, 'trackOrder']);
+    Route::post('/orders/{order}/pay', [PaymentController::class, 'createSnapToken']);
 });
+    Route::post('/midtrans/notification', [PaymentController::class, 'handleNotification']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);

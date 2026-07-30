@@ -15,8 +15,8 @@ export default function CustomerMenu() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
+  
+    useEffect(() => {
     const fetchData = async () => {
       try {
         const [tableRes, menuRes] = await Promise.all([
@@ -25,6 +25,12 @@ export default function CustomerMenu() {
         ]);
         setTable(tableRes.data);
         setCategories(menuRes.data);
+
+        // Kalau meja sudah kosong (order sebelumnya sudah selesai), hapus nama lama
+        if (tableRes.data.status === "kosong") {
+          localStorage.removeItem(`ob_name_${tableId}`);
+          setCustomerName("");
+        }
       } catch (err) {
         setError("Meja tidak ditemukan. Pastikan Anda scan QR code yang benar.");
       } finally {

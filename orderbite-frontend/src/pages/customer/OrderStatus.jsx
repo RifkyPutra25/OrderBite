@@ -9,6 +9,7 @@ export default function OrderStatus() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [paying, setPaying] = useState(false);
 
   const fetchOrder = async () => {
     try {
@@ -21,6 +22,22 @@ export default function OrderStatus() {
     }
   };
 
+    const handlePayNow = async () => {
+    setPaying(true);
+    try {
+      const res = await publicApi.post(`/orders/${orderId}/pay`);
+      window.snap.pay(res.data.snap_token, {
+        onSuccess: () => fetchOrder(),
+        onPending: () => fetchOrder(),
+        onError: () => setError("Pembayaran gagal, silakan coba lagi."),
+        onClose: () => setPaying(false),
+      });
+    } catch (err) {
+      setError("Gagal memulai pembayaran");
+    } finally {
+      setPaying(false);
+    }
+  };
   useEffect(() => {
     fetchOrder();
     const channel = echo.channel(`order.${orderId}`);
@@ -44,7 +61,7 @@ export default function OrderStatus() {
         <p style={{ margin: 0, opacity: 0.9, fontSize: 13 }}>Meja {order.table?.nomor_meja}</p>
         <h2 style={{ margin: "4px 0 10px", color: "white" }}>Status Pesanan</h2>
         <span className={`badge ${order.status_pembayaran === "lunas" ? "badge-success" : "badge-warning"}`} style={{ background: "rgba(255,255,255,0.25)", color: "white" }}>
-          {order.status_pembayaran === "lunas" ? "Lunas" : "Belum Bayar (bayar di kasir)"}
+          {order.status_pembayaran === "lunas" ? "Lunas" : "Belum Bayar"}
         </span>
       </div>
 
@@ -61,9 +78,19 @@ export default function OrderStatus() {
       })}
 
       <div className="card" style={{ marginTop: 16, display: "flex", justifyContent: "space-between", fontWeight: 700 }}>
-        <span>Total</span>
-        <span>Rp {Number(order.total_harga).toLocaleString("id-ID")}</span>
-      </div>
+  <span>Total</span>
+  <span>Rp {Number(order.total_harga).toLocaleString("id-ID")}</span>
+</div>
+
+    {order.status_pembayaran !== "lunas" && (
+      <button
+        onClick={handlePayNow}
+        disabled={paying}
+        style={{ width: "100%", justifyContent: "center", marginTop: 12, padding: 12 }}
+      >
+        {paying ? "Memproses..." : "Bayar Sekarang"}
+      </button>
+)}
 
       <Link to={`/order/${tableId}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 20, color: "var(--primary-dark)", fontWeight: 600, textDecoration: "none", fontSize: 14 }}>
         <ArrowLeft size={16} /> Pesan Lagi

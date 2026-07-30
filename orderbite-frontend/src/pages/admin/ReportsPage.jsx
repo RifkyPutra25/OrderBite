@@ -12,28 +12,49 @@ export default function ReportsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-  const fetchAll = async () => {
-    try {
-      const res = await api.get("/reports/full");
-      setSummary(res.data.summary);
-      setWeeklyRevenue(res.data.weekly_revenue);
-      setBestSellers(res.data.best_sellers);
-      setTransactions(res.data.transactions.data || []);
-    } catch (err) {
-      setError("Gagal memuat laporan");
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchAll();
-}, []);
+    const fetchAll = async () => {
+      try {
+        const res = await api.get("/reports/full");
+        setSummary(res.data.summary);
+        setWeeklyRevenue(res.data.weekly_revenue);
+        setBestSellers(res.data.best_sellers);
+        setTransactions(res.data.transactions.data || []);
+      } catch (err) {
+        setError("Gagal memuat laporan");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAll();
+  }, []);
 
   const formatRupiah = (num) => `Rp ${Number(num).toLocaleString("id-ID")}`;
+  const formatRupiahShort = (num) => {
+    const n = Number(num);
+    if (n >= 1000000) return `${(n / 1000000).toFixed(1)}jt`;
+    if (n >= 1000) return `${(n / 1000).toFixed(0)}rb`;
+    return n.toString();
+  };
 
- if (loading) return <LoadingScreen />;
+  if (loading) return <LoadingScreen />;
   if (error) return <p style={{ color: "#dc2626" }}>{error}</p>;
 
-  const maxRevenue = Math.max(...weeklyRevenue.map((d) => Number(d.total)), 1);
+  // Bangun 7 hari terakhir lengkap (isi 0 untuk hari tanpa transaksi)
+  const last7Days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    return d.toISOString().slice(0, 10);
+  });
+  const revenueMap = Object.fromEntries(weeklyRevenue.map((d) => [d.tanggal, Number(d.total)]));
+  const chartData = last7Days.map((tanggal) => ({
+    tanggal,
+    total: revenueMap[tanggal] || 0,
+    label: new Date(tanggal).toLocaleDateString("id-ID", { weekday: "short" }),
+  }));
+
+  const maxRevenue = Math.max(...chartData.map((d) => d.total), 1);
+  const hasAnyRevenue = chartData.some((d) => d.total > 0);
+  const gridLines = [1, 0.75, 0.5, 0.25, 0];
 
   return (
     <div>
@@ -58,24 +79,73 @@ export default function ReportsPage() {
         </div>
       </div>
 
+      {/* ===== Grafik Pendapatan 7 Hari ===== */}
       <div className="card" style={{ marginBottom: 24 }}>
         <h4 style={{ margin: "0 0 4px", display: "flex", alignItems: "center", gap: 8, fontSize: 15 }}>
           <TrendingUp size={17} /> Pendapatan 7 Hari Terakhir
         </h4>
-        {weeklyRevenue.length === 0 ? (
-          <p style={{ fontSize: 13 }}>Belum ada data</p>
+
+        {!hasAnyRevenue ? (
+          <div style={{ textAlign: "center", padding: "40px 10px", color: "var(--text-faint)" }}>
+            <TrendingUp size={30} style={{ opacity: 0.4, marginBottom: 8 }} />
+            <p style={{ margin: 0, fontSize: 13 }}>Belum ada transaksi lunas dalam 7 hari terakhir.</p>
+          </div>
         ) : (
-          <div style={{ display: "flex", gap: 10, alignItems: "flex-end", height: 160, marginTop: 20, padding: "0 6px" }}>
-            {weeklyRevenue.map((d) => (
-              <div key={d.tanggal} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1 }}>
-                <div style={{
-                  width: "100%",
-                  background: "linear-gradient(180deg, #a9cba3, #4f8a5c)",
-                  height: `${(Number(d.total) / maxRevenue) * 130}px`,
-                  borderRadius: "6px 6px 0 0",
-                  minHeight: 4,
-                }} title={formatRupiah(d.total)} />
-                <span style={{ fontSize: 11, marginTop: 6, color: "var(--text-muted)" }}>{d.tanggal.slice(5)}</span>
+          <div style={{ display: "flex", marginTop: 24 }}>
+            {/* Sumbu Y (grid label nominal) */}
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: 180, paddingRight: 10, paddingBottom: 26 }}>
+              {gridLines.map((g) => (
+                <span key={g} style={{ fontSize: 10, color: "var(--text-faint)", textAlign: "right" }}>
+                  {formatRupiahShort(maxRevenue * g)}
+                </span>
+              ))}
+            </div>
+
+            {/* Area chart */}
+            <div style={{ flex: 1, position: "relative", height: 180 }}>
+              {/* Garis grid horizontal */}
+              {gridLines.map((g) => (
+                <div key={g} style={{
+                  position: "absolute", left: 0, right: 0,
+                  top: `${(1 - g) * 100}%`,
+                  borderTop: "1px dashed var(--border)",
+                }} />
+              ))}
+
+              {/* Bars */}
+              <div style={{ display: "flex", gap: 10, alignItems: "flex-end", height: "100%", position: "relative" }}>
+                {chartData.map((d) => (
+                  <div key={d.tanggal} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", height: "100%", justifyContent: "flex-end" }}>
+                    {d.total > 0 && (
+                      <span style={{ fontSize: 10.5, fontWeight: 700, color: "var(--primary-dark)", marginBottom: 4 }}>
+                        {formatRupiahShort(d.total)}
+                      </span>
+                    )}
+                    <div
+                      title={`${d.tanggal}: ${formatRupiah(d.total)}`}
+                      style={{
+                        width: "100%",
+                        maxWidth: 42,
+                        background: d.total > 0 ? "linear-gradient(180deg, #a9cba3, #4f8a5c)" : "var(--border)",
+                        height: d.total > 0 ? `${(d.total / maxRevenue) * 100}%` : 3,
+                        borderRadius: "6px 6px 2px 2px",
+                        minHeight: 3,
+                        transition: "height 0.3s ease",
+                        cursor: "pointer",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {hasAnyRevenue && (
+          <div style={{ display: "flex", marginTop: 8, paddingLeft: 42 }}>
+            {chartData.map((d) => (
+              <div key={d.tanggal} style={{ flex: 1, textAlign: "center" }}>
+                <span style={{ fontSize: 11, color: "var(--text-muted)", fontWeight: 500 }}>{d.label}</span>
               </div>
             ))}
           </div>

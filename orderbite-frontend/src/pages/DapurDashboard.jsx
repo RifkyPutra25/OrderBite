@@ -49,11 +49,13 @@ export default function DapurDashboard() {
 
   if (loading) return <LoadingScreen />;
 
-  const pendingItems = orders.flatMap((order) =>
-    (order.items || [])
-      .filter((item) => item.status !== "siap")
-      .map((item) => ({ ...item, tableNumber: order.table?.nomor_meja, customerName: order.nama_customer }))
-  );
+  // Kelompokkan per ORDER (1 meja + 1 customer = 1 kartu), sembunyikan order yang semua itemnya sudah "siap"
+  const activeOrders = orders
+    .map((order) => ({
+      ...order,
+      items: (order.items || []).filter((item) => item.status !== "siap"),
+    }))
+    .filter((order) => order.items.length > 0);
 
   return (
     <div>
@@ -73,39 +75,48 @@ export default function DapurDashboard() {
 
         <h3 style={{ fontSize: 16, marginBottom: 14 }}>Antrian Pesanan</h3>
 
-        {pendingItems.length === 0 ? (
+        {activeOrders.length === 0 ? (
           <div className="card empty-state">
             <div className="empty-state-icon"><CheckCircle2 size={26} /></div>
             <p>Tidak ada pesanan yang perlu dimasak saat ini.</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 14 }}>
-            {pendingItems.map((item) => (
-              <div key={item.id} className="card" style={{
-                borderLeft: item.status === "dimasak" ? "4px solid var(--warning)" : "4px solid #9ca3af",
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <h4 style={{ margin: 0, fontSize: 16 }}>Meja {item.tableNumber}</h4>
-                  {item.status === "dimasak" && <Flame size={16} color="#b45309" />}
-                </div>
-                <p style={{ margin: "3px 0 10px", fontSize: 12.5 }}>{item.customerName}</p>
-                <strong style={{ fontSize: 14 }}>{item.menu_item?.nama} x{item.qty}</strong>
-                {item.catatan && <p style={{ fontStyle: "italic", fontSize: 12.5, marginTop: 6 }}>Catatan: {item.catatan}</p>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 14 }}>
+            {activeOrders.map((order) => {
+              const anyDimasak = order.items.some((it) => it.status === "dimasak");
+              return (
+                <div key={order.id} className="card" style={{
+                  borderLeft: anyDimasak ? "4px solid var(--warning)" : "4px solid #9ca3af",
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <h4 style={{ margin: 0, fontSize: 16 }}>Meja {order.table?.nomor_meja}</h4>
+                    {anyDimasak && <Flame size={16} color="#b45309" />}
+                  </div>
+                  <p style={{ margin: "3px 0 12px", fontSize: 12.5 }}>{order.nama_customer}</p>
 
-                <div style={{ marginTop: 12 }}>
-                  <span className={`badge ${item.status === "dimasak" ? "badge-warning" : "badge-neutral"}`}>{item.status}</span>
-                </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {order.items.map((item) => (
+                      <div key={item.id} style={{ borderTop: "1px solid var(--border)", paddingTop: 10 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <strong style={{ fontSize: 14 }}>{item.menu_item?.nama} x{item.qty}</strong>
+                          <span className={`badge ${item.status === "dimasak" ? "badge-warning" : "badge-neutral"}`}>{item.status}</span>
+                        </div>
+                        {item.catatan && <p style={{ fontStyle: "italic", fontSize: 12.5, margin: "4px 0 0" }}>Catatan: {item.catatan}</p>}
 
-                <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
-                  {item.status === "pending" && (
-                    <button onClick={() => handleUpdateStatus(item.id, "dimasak")} style={{ width: "100%", justifyContent: "center" }}>Mulai Masak</button>
-                  )}
-                  {item.status === "dimasak" && (
-                    <button onClick={() => handleUpdateStatus(item.id, "siap")} style={{ width: "100%", justifyContent: "center", background: "var(--success)" }}>Tandai Siap</button>
-                  )}
+                        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                          {item.status === "pending" && (
+                            <button onClick={() => handleUpdateStatus(item.id, "dimasak")} style={{ width: "100%", justifyContent: "center", padding: "6px 12px", fontSize: 13 }}>Mulai Masak</button>
+                          )}
+                          {item.status === "dimasak" && (
+                            <button onClick={() => handleUpdateStatus(item.id, "siap")} style={{ width: "100%", justifyContent: "center", padding: "6px 12px", fontSize: 13, background: "var(--success)" }}>Tandai Siap</button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
