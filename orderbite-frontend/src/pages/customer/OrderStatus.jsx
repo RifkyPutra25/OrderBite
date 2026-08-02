@@ -82,15 +82,11 @@ export default function OrderStatus() {
   <span>Rp {Number(order.total_harga).toLocaleString("id-ID")}</span>
 </div>
 
-    {order.status_pembayaran !== "lunas" && (
-      <button
-        onClick={handlePayNow}
-        disabled={paying}
-        style={{ width: "100%", justifyContent: "center", marginTop: 12, padding: 12 }}
-      >
-        {paying ? "Memproses..." : "Bayar Sekarang"}
-      </button>
-)}
+        {order.status_pembayaran !== "lunas" && (
+      <p style={{ textAlign: "center", marginTop: 12, fontSize: 13, color: "var(--text-muted)" }}>
+        Silakan lakukan pembayaran di kasir.
+      </p>
+    )}
 
       <Link to={`/order/${tableId}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 20, color: "var(--primary-dark)", fontWeight: 600, textDecoration: "none", fontSize: 14 }}>
         <ArrowLeft size={16} /> Pesan Lagi
