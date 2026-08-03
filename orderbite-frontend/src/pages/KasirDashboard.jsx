@@ -5,6 +5,7 @@ import { LogOut, Store, ShoppingCart, X } from "lucide-react";
 import api from "../api/axios";
 import echo from "../echo";
 import LoadingScreen from "../components/LoadingScreen";
+import ReceiptModal from "../components/ReceiptModal";
 
 export default function KasirDashboard() {
   const { user, logout } = useAuth();
@@ -15,6 +16,7 @@ export default function KasirDashboard() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [receiptOrder, setReceiptOrder] = useState(null);
 
   const [selectedTable, setSelectedTable] = useState("");
   const [namaCustomer, setNamaCustomer] = useState("");
@@ -195,13 +197,14 @@ export default function KasirDashboard() {
           ) : (
             <table>
               <thead>
-                <tr>
-                  <th>Meja</th><th>Customer</th><th>Items</th><th>Total</th><th>Pembayaran</th><th style={{ width: 200 }}>Aksi</th>
-                </tr>
-              </thead>
+                  <tr>
+                    <th>Kode</th><th>Meja</th><th>Customer</th><th>Items</th><th>Total</th><th>Pembayaran</th><th style={{ width: 200 }}>Aksi</th>
+                  </tr>
+                </thead>
               <tbody>
                 {orders.map((order) => (
                   <tr key={order.id}>
+                    <td><span className="badge badge-neutral" style={{ fontWeight: 700 }}>#{order.id}</span></td>
                     <td>{order.table?.nomor_meja}</td>
                     <td>{order.nama_customer}</td>
                     <td style={{ fontSize: 13 }}>
@@ -219,6 +222,7 @@ export default function KasirDashboard() {
                       {order.status_pembayaran !== "lunas" && (
                         <button className="secondary" onClick={() => handleMarkPaid(order.id)}>Tandai Lunas</button>
                       )}
+                      <button className="secondary" onClick={() => setReceiptOrder(order)}>Cetak</button>
                       <button className="secondary" onClick={() => handleCompleteOrder(order.id)}>Selesai</button>
                     </td>
                   </tr>
@@ -227,6 +231,7 @@ export default function KasirDashboard() {
             </table>
           )}
         </section>
+        <ReceiptModal order={receiptOrder} onClose={() => setReceiptOrder(null)} />
       </div>
     </div>
   );
