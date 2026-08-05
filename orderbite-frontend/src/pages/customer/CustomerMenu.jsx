@@ -77,6 +77,15 @@ export default function CustomerMenu() {
         nama_customer: customerName,
         items: cart.map((c) => ({ menu_item_id: c.menu_item_id, qty: c.qty, catatan: c.catatan || null })),
       });
+      const historyKey = `ob_history_${tableId}`;
+      const existingHistory = JSON.parse(localStorage.getItem(historyKey) || "[]");
+      existingHistory.unshift({
+        id: res.data.id,
+        total: res.data.total_harga,
+        created_at: res.data.created_at,
+      });
+      localStorage.setItem(historyKey, JSON.stringify(existingHistory.slice(0, 20)));
+
       localStorage.setItem(`ob_last_order_${tableId}`, res.data.id);
       navigate(`/order/${tableId}/status/${res.data.id}`);
     } catch (err) {
@@ -106,9 +115,18 @@ export default function CustomerMenu() {
 
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: cart.length > 0 ? 140 : 30 }}>
-      <div style={{ background: "linear-gradient(135deg, #a9cba3, #4f8a5c)", color: "white", padding: "28px 20px", borderRadius: "0 0 20px 20px", marginBottom: 20 }}>
-        <p style={{ margin: 0, opacity: 0.9, fontSize: 13 }}>Meja {table?.nomor_meja}</p>
-        <h2 style={{ margin: "4px 0 0", color: "white" }}>Halo, {customerName}! 👋</h2>
+      <div style={{ background: "linear-gradient(135deg, #a9cba3, #4f8a5c)", color: "white", padding: "28px 20px", borderRadius: "0 0 20px 20px", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div>
+          <p style={{ margin: 0, opacity: 0.9, fontSize: 13 }}>Meja {table?.nomor_meja}</p>
+          <h2 style={{ margin: "4px 0 0", color: "white" }}>Halo, {customerName}! 👋</h2>
+        </div>
+        <Link to={`/order/${tableId}/history`} style={{
+          background: "rgba(255,255,255,0.2)", padding: "8px 14px", borderRadius: 10,
+          color: "white", textDecoration: "none", fontSize: 13, fontWeight: 600,
+          display: "flex", alignItems: "center", gap: 6,
+        }}>
+          <Clock size={15} /> Riwayat
+        </Link>
       </div>
 
       <div style={{ padding: "0 20px" }}>
