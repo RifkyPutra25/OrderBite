@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use App\Exports\TransactionsExport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
@@ -178,4 +180,13 @@ public function fullReport(Request $request)
         'transactions' => $transactions,
     ]);
 }
+    public function exportTransactions(Request $request)
+    {
+        $from = $request->query('from');
+        $to = $request->query('to');
+
+        $filename = 'laporan-orderbite-' . now()->format('Y-m-d') . '.xlsx';
+
+        return Excel::download(new TransactionsExport($from, $to), $filename);
+    }
 }
