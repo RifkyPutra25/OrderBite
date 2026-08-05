@@ -47,7 +47,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/reports/transactions', [ReportController::class, 'transactions']);
         Route::get('/reports/overview', [ReportController::class, 'overview']);
         Route::get('/reports/full', [ReportController::class, 'fullReport']);
-        
+        Route::get('/reports/export', [ReportController::class, 'exportTransactions']);
+
     });
 
     Route::middleware('role:admin,kasir')->group(function () {
