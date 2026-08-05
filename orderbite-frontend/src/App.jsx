@@ -12,6 +12,7 @@ import UsersPage from "./pages/admin/UsersPage";
 import ReportsPage from "./pages/admin/ReportsPage";
 import CustomerMenu from "./pages/customer/CustomerMenu";
 import OrderStatus from "./pages/customer/OrderStatus";
+import OrderHistory from "./pages/customer/OrderHistory";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       <Route path="/order/:tableId" element={<CustomerMenu />} />
+      <Route path="/order/:tableId/history" element={<OrderHistory />} />
       <Route path="/order/:tableId/status/:orderId" element={<OrderStatus />} />
 
       <Route
