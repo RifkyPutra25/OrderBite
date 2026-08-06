@@ -23,6 +23,7 @@ class MenuItemController extends Controller
             'harga' => 'required|numeric|min:0',
             'foto' => 'nullable|image|max:2048',
             'tersedia' => 'boolean',
+            'catatan_ketersediaan' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('foto')) {
@@ -49,6 +50,7 @@ class MenuItemController extends Controller
             'harga' => 'required|numeric|min:0',
             'foto' => 'nullable|image|max:2048',
             'tersedia' => 'boolean',
+            'catatan_ketersediaan' => 'nullable|string|max:255',
         ]);
 
         if ($request->hasFile('foto')) {
