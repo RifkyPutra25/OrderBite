@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { BarChart3, TrendingUp, Award, Receipt } from "lucide-react";
 import api from "../../api/axios";
 import LoadingScreen from "../../components/LoadingScreen";
+import { Download } from "lucide-react";
 
 export default function ReportsPage() {
   const [summary, setSummary] = useState(null);
@@ -36,6 +37,25 @@ export default function ReportsPage() {
     return n.toString();
   };
 
+  const handleExport = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch("http://orderbite-backend.test/api/reports/export", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Gagal export");
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `laporan-orderbite-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    alert("Gagal mengunduh laporan");
+  }
+};
+
   if (loading) return <LoadingScreen />;
   if (error) return <p style={{ color: "#dc2626" }}>{error}</p>;
 
@@ -57,13 +77,16 @@ export default function ReportsPage() {
   const gridLines = [1, 0.75, 0.5, 0.25, 0];
 
   return (
-    <div>
-      <div className="page-header">
+          <div>
+            <div className="page-header" style={{ alignItems: "center" }}>
         <div>
           <div className="page-header-icon"><BarChart3 size={22} /></div>
           <h2>Laporan Penjualan</h2>
           <p>Pantau performa penjualan restoran Anda.</p>
         </div>
+        <button onClick={handleExport}>
+          <Download size={15} /> Export Excel
+        </button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
