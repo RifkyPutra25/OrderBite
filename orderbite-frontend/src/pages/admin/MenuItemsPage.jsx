@@ -12,6 +12,7 @@ export default function MenuItemsPage() {
     deskripsi: "",
     harga: "",
     tersedia: true,
+    catatan_ketersediaan: "",
   });
   const [fotoFile, setFotoFile] = useState(null);
   const [editingId, setEditingId] = useState(null);
@@ -47,7 +48,7 @@ export default function MenuItemsPage() {
   };
 
   const resetForm = () => {
-    setForm({ category_id: "", nama: "", deskripsi: "", harga: "", tersedia: true });
+    setForm({ category_id: "", nama: "", deskripsi: "", harga: "", tersedia: true, catatan_ketersediaan: "" });
     setFotoFile(null);
     setEditingId(null);
   };
@@ -62,6 +63,7 @@ export default function MenuItemsPage() {
     formData.append("deskripsi", form.deskripsi);
     formData.append("harga", form.harga);
     formData.append("tersedia", form.tersedia ? 1 : 0);
+    formData.append("catatan_ketersediaan", form.tersedia ? "" : form.catatan_ketersediaan);
     if (fotoFile) formData.append("foto", fotoFile);
 
     try {
@@ -90,6 +92,7 @@ export default function MenuItemsPage() {
       deskripsi: item.deskripsi || "",
       harga: item.harga,
       tersedia: !!item.tersedia,
+      catatan_ketersediaan: item.catatan_ketersediaan || "",
     });
     setFotoFile(null);
   };
@@ -167,6 +170,19 @@ export default function MenuItemsPage() {
             <span style={{ fontSize: 14, fontWeight: 500, color: "var(--text)" }}>Tersedia untuk dipesan</span>
           </label>
 
+          {!form.tersedia && (
+            <div className="form-row">
+              <label>Alasan Tidak Tersedia</label>
+              <input
+                type="text"
+                name="catatan_ketersediaan"
+                placeholder="Contoh: Bahan habis, sedang direstock"
+                value={form.catatan_ketersediaan}
+                onChange={handleChange}
+              />
+            </div>
+          )}
+
           <div className="form-actions">
             <button type="submit">
               {editingId ? <Pencil size={15} /> : <Plus size={15} />}
@@ -211,9 +227,14 @@ export default function MenuItemsPage() {
                 <td>{item.category?.nama_kategori || "-"}</td>
                 <td>Rp {Number(item.harga).toLocaleString("id-ID")}</td>
                 <td>
-                  <span className={`badge ${item.tersedia ? "badge-success" : "badge-neutral"}`}>
+                  <span className={`badge ${item.tersedia ? "badge-success" : "badge-neutral"}`} title={item.catatan_ketersediaan || ""}>
                     {item.tersedia ? "Tersedia" : "Tidak Tersedia"}
                   </span>
+                  {!item.tersedia && item.catatan_ketersediaan && (
+                    <p style={{ margin: "4px 0 0", fontSize: 11.5, color: "var(--text-faint)" }}>
+                      {item.catatan_ketersediaan}
+                    </p>
+                  )}
                 </td>
                 <td>
                   <button className="icon-btn secondary" onClick={() => handleEdit(item)} title="Edit"><Pencil size={15} /></button>
