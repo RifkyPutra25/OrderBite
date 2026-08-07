@@ -35,7 +35,7 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-shell">
+    <div className="auth-shell page-transition">
       <div className="auth-brand-panel">
         <div className="auth-brand-content">
           <div className="auth-brand-icon">
