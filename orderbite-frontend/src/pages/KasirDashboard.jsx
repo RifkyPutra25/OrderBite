@@ -107,7 +107,7 @@ export default function KasirDashboard() {
 
  if (loading) return <LoadingScreen />;
   return (
-    <div>
+    <div className="page-transition">
       <div className="dashboard-header">
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div className="sidebar-brand-icon" style={{ background: "var(--primary-light)", color: "var(--primary-dark)" }}><Store size={19} /></div>
