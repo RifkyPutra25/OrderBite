@@ -57,7 +57,9 @@ export default function AdminLayout() {
       </aside>
 
       <main className="admin-content">
-        <Outlet />
+        <div key={location.pathname} className="page-transition">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
