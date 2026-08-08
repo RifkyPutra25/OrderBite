@@ -100,8 +100,8 @@ export default function CustomerMenu() {
 
   if (!customerName) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #a9cba3 0%, #4f8a5c 100%)" }}>
-        <div className="login-container" style={{ margin: 0 }}>
+      <div className="page-transition" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #a9cba3 0%, #4f8a5c 100%)" }}>
+ n      <div className="login-container" style={{ margin: 0 }}>
           <h2>🍽️ Selamat Datang</h2>
           <p style={{ marginBottom: 0 }}>Meja: <strong style={{ color: "var(--text)" }}>{table?.nomor_meja}</strong></p>
           <form onSubmit={handleSetName}>
@@ -114,7 +114,7 @@ export default function CustomerMenu() {
   }
 
   return (
-    <div style={{ maxWidth: 640, margin: "0 auto", paddingBottom: cart.length > 0 ? 140 : 30 }}>
+     <div className="page-transition" style={{ maxWidth: 640, margin: "0 auto", paddingBottom: cart.length > 0 ? 140 : 30 }}>
       <div style={{ background: "linear-gradient(135deg, #a9cba3, #4f8a5c)", color: "white", padding: "28px 20px", borderRadius: "0 0 20px 20px", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div>
           <p style={{ margin: 0, opacity: 0.9, fontSize: 13 }}>Meja {table?.nomor_meja}</p>
