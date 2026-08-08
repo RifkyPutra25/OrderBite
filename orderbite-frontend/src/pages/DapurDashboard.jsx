@@ -58,7 +58,7 @@ export default function DapurDashboard() {
     .filter((order) => order.items.length > 0);
 
   return (
-    <div>
+      <div className="page-transition">
       <div className="dashboard-header">
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div className="sidebar-brand-icon" style={{ background: "var(--primary-light)", color: "var(--primary-dark)" }}><ChefHat size={19} /></div>
