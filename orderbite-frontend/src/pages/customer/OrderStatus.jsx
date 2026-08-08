@@ -40,7 +40,7 @@ export default function OrderStatus() {
   };
 
   return (
-    <div style={{ maxWidth: 500, margin: "0 auto", padding: 20 }}>
+    <div className="page-transition" style={{ maxWidth: 500, margin: "0 auto", padding: 20 }}>
       {/* Popup instruksi ke kasir */}
       {showPopup && order.status_pembayaran !== "lunas" && (
         <div style={{
